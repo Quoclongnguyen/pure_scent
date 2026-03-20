@@ -4,11 +4,21 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import connectDB from "./config/db.js";
 import userRoutes from "./routes/userRoutes.js";
+import productRouters from "./routes/productRouters.js"
+import categoryRouters from "./routes/categoryRouters.js"
+
 
 dotenv.config();
 
 // Connect to MongoDB
-connectDB();
+connectDB().then(() => {
+  app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+  });
+}).catch((error) => {
+  console.log(`Error: ${error.message}`);
+  process.exit(1);
+});
 
 const app = express();
 
@@ -22,6 +32,8 @@ app.use(cors({
 }));
 
 app.use("/api/users", userRoutes);
+app.use("/api/products", productRouters)
+app.use("/api/categories", categoryRouters)
 
 // Basic route
 app.get("/", (req, res) => {
@@ -30,6 +42,3 @@ app.get("/", (req, res) => {
 
 const PORT = process.env.PORT || 3001;
 
-app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
-});
