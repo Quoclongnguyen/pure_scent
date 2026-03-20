@@ -27,12 +27,12 @@ const userSchema = mongoose.Schema(
   }
 );
 
-// Method to verify password match
+// Phương thức để xác minh mật khẩu
 userSchema.methods.matchPassword = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
 };
 
-// Middleware to hash password before saving
+// Middleware để mã hóa mật khẩu trước khi lưu
 userSchema.pre("save", async function (next) {
   if (!this.isModified("password")) {
     next();

@@ -1,11 +1,11 @@
 import jwt from "jsonwebtoken";
 import User from "../models/userModel.js";
 
-// User must be authenticated
+// Người dùng phải được xác thực
 const protect = async (req, res, next) => {
   let token;
 
-  // Read the JWT from the cookie
+  // Đọc JWT từ cookie
   token = req.cookies.jwt;
 
   if (token) {
@@ -15,19 +15,19 @@ const protect = async (req, res, next) => {
       next();
     } catch (error) {
       console.error(error);
-      res.status(401).json({ message: "Not authorized, token failed" });
+      res.status(401).json({ message: "Không được xác thực, token thất bại" });
     }
   } else {
-    res.status(401).json({ message: "Not authorized, no token" });
+    res.status(401).json({ message: "Không được xác thực, không có token" });
   }
 };
 
-// User must be an admin
+// Người dùng phải là quản trị viên.
 const admin = (req, res, next) => {
   if (req.user && req.user.isAdmin) {
     next();
   } else {
-    res.status(401).json({ message: "Not authorized as admin" });
+    res.status(401).json({ message: "Không được xác thực, không phải là admin" });
   }
 };
 
