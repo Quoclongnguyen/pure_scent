@@ -4,20 +4,22 @@ import { ShoppingCart, User, Search } from 'lucide-react';
 
 const Navbar = () => {
     return (
-        <nav className="h-20 w-full flex items-center border-b border-gray-100 bg-white sticky top-0 z-50">
-            <div className="container mx-auto h-full flex justify-between items-center px-8 md:px-12">
+        <nav className="h-20 w-full flex items-center justify-center border-b border-gray-100 bg-white sticky top-0 z-50">
+            <div className="max-w-[95%] w-full h-auto flex justify-between items-center px-6">
                 {/* Logo */}
-                <Link to="/" className="font-serif text-2xl tracking-wide font-medium ">
+                <Link to="/" className=" font-serif text-2xl tracking-wide font-medium">
                     PURE SCENT
                 </Link>
                 {/* Menu chính */}
-                <ul className="flex gap-5 items-center cursor-pointer">
-                    <li><Link to="/">Trang chủ</Link></li>
-                    <li><Link to="/shop">Cửa hàng</Link></li>
-                    <li><Link to="/about">Thương hiệu</Link></li>
+                <ul className="flex gap-8 items-center cursor-pointer ">
+                    <li className=' hover:font-semibold transition-all duration-300'><Link to="/">Trang chủ</Link></li>
+                    <li className=' hover:font-semibold transition-all duration-300'><Link to="/shop">Cửa hàng</Link></li>
+                    <li className=' hover:font-semibold transition-all duration-300'><Link to="/about">Thương hiệu</Link></li>
+                    <li className=' hover:font-semibold transition-all duration-300'><Link to="/about">Nước Hoa</Link></li>
+                    <li className=' hover:font-semibold transition-all duration-300'><Link to="/about">Liên hệ</Link></li>
                 </ul>
                 {/* Icons tiện ích */}
-                <div className="flex gap-4 items-center cursor-pointer">
+                <div className="flex gap-5 items-center cursor-pointer">
                     <Search size={20} strokeWidth={1.5} />
                     <Link to="/login">
                         <User size={20} strokeWidth={1.5} />
