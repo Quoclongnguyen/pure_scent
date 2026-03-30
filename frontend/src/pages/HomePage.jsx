@@ -83,8 +83,81 @@ const HomePage = () => {
                         ))}
 
                     </div>
+                    <div className='flex justify-center items-center mt-8'>
+                        <button className='bg-gray-500 text-white  p-4 uppercase text-xs tracking-widest hover:bg-gray-800 transition-all font-medium cursor-pointer'>
+                            Xem tất cả</button>
+                    </div>
+
 
                 </section>
+
+                <section className='w-full bg-[#f9f9f9] py-16 md:py-24'>
+                    <div className='max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-16 items-center'>
+                        <div className='relative h-[450px] overflow-hidden rounded-[8px] shadow-2xl'>
+                            <img
+                                src="/src/assets/img1.png"
+                                alt="Nước Hoa"
+                                className='w-full h-full object-cover'
+                            />
+                        </div>
+                        <div className='space-y-8'>
+                            <div className='grid justify-center justify-items-start gap-6 items-center'>
+
+
+                                <h1 className='font-serif text-5xl leading-tight text-black'>
+                                    Đánh Thức <br />
+                                    <span className='italic font-light '>Mọi Giác Quan</span>
+                                    <br />
+                                </h1>
+                                <p className='text-gray-500 text-lg leading-relaxed max-w-md'>
+                                    Bắt nguồn từ đam mê với những nốt hương thiên nhiên, PureScent mang đến bộ sưu tập nước hoa cao cấp được tuyển chọn kỹ lưỡng.
+                                    Chúng tôi tập trung vào độ lưu hương bền lâu và sự tinh tế trong từng tầng hương.
+                                </p>
+                                <button className='bg-gray-500 text-white  p-4 uppercase text-xs tracking-widest hover:bg-gray-800 transition-all font-medium cursor-pointer'>
+                                    Mua Ngay
+                                </button>
+                            </div>
+                        </div>
+
+
+
+                    </div>
+
+
+
+                </section>
+
+                {/*  Newsletter */}
+                <section className='w-full bg-white py-24 text-black'>
+                    <div className='max-w-4xl mx-auto px-6 text-center space-y-10'>
+
+                        <div className='space-y-4'>
+                            <h2 className='font-serif text-4xl leading-tight'>
+                                Kết nối với <span className='italic font-light text-gray-500'>PureScent</span>
+                            </h2>
+                            <p className='text-gray-500 text-sm uppercase tracking-[0.3em] font-medium'>
+                                Nhận ngay voucher 10% cho đơn hàng đầu tiên của bạn
+                            </p>
+                        </div>
+
+                        <form className='flex flex-col md:flex-row items-center justify-center gap-6 max-w-2xl mx-auto'>
+                            <input
+                                type="email"
+                                placeholder="ĐỊA CHỈ EMAIL CỦA BẠN"
+                                className='w-full md:flex-1 bg-transparent border-b border-gray-700 py-4 text-xs tracking-widest focus:outline-none focus:border-white transition-colors duration-300'
+                            />
+                            <button className='w-full md:w-auto bg-white text-black px-12 py-4 text-[10px] font-bold uppercase tracking-[0.3em] hover:bg-gray-200 transition-all duration-300'>
+                                Đăng Ký
+                            </button>
+                        </form>
+
+                        <p className='text-[10px] text-gray-600 uppercase tracking-widest'>
+                            Chúng tôi cam kết bảo mật thông tin và không gửi spam.
+                        </p>
+
+                    </div>
+                </section>
+
 
             </main >
 
