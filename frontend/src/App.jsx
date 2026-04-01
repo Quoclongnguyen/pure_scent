@@ -8,6 +8,7 @@ import ShopPage from './pages/ShopPage'
 import BrandPage from './pages/BrandPage'
 import ProductDetailPage from './pages/ProductDetailPage'
 import CartPage from './pages/CartPage'
+import CheckoutPage from './pages/CheckoutPage'
 
 function App() {
 
@@ -36,6 +37,10 @@ function App() {
         <Route
           path='/cart'
           element={<CartPage />} />
+
+        <Route
+          path='/checkout'
+          element={<CheckoutPage />} />
 
         <Route
           path='/login'

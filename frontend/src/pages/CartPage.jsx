@@ -205,9 +205,10 @@ const CartPage = () => {
                             <p className="text-[10px] text-gray-400 mb-6 italic leading-relaxed">
                                 Thuế và chi phí vận chuyển cuối cùng sẽ được tính cụ thể tại bước Thanh toán.
                             </p>
-                            <button className="w-full bg-black text-white py-5 text-[10px] font-bold uppercase tracking-[0.3em] hover:bg-gray-800 transition-all cursor-pointer">
+                            <span className="text-white"><Link to="/checkout" className="w-full bg-black py-5 text-[10px] font-bold uppercase tracking-[0.3em] hover:bg-gray-800 transition-all cursor-pointer block text-center">
                                 Tiến hành thanh toán
-                            </button>
+                            </Link></span>
+
                         </div>
                     </div>
                 </aside>
