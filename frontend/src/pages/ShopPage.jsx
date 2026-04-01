@@ -1,4 +1,5 @@
 import React from 'react'
+import { Link } from 'react-router-dom';
 import ProductCard from '../components/productCard/ProductCard'
 import Footer from '../components/footer/Footer';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
@@ -18,16 +19,19 @@ const ShopPage = () => {
     return (
         <main className='min-h-screen bg-white'>
 
-            <div className='bg-[#f9f9f9] py-16 border-b border-gray-100 mb-12'>
+            <div className='bg-[#f9f9f9] py-8 border-b border-gray-100 mb-12'>
                 <div className='max-w-7xl mx-auto px-6 text-center space-y-4'>
                     <h1 className='font-serif text-4xl uppercase tracking-[0.2em]'>
                         Nước Hoa</h1>
-                    <p className='text-gray-400 text-[15px] uppercase tracking-widest '>
-                        Trang chủ / Nước Hoa</p>
+                    <p className='text-gray-400 text-[10px] uppercase tracking-widest flex items-center justify-center gap-2'>
+                        <Link to="/" className='hover:text-black transition-colors flex'>Trang chủ</Link>
+                        <span>/</span>
+                        <span className='text-black'><Link to="/shop" className='hover:text-black transition-colors flex'>Nước Hoa</Link></span>
+                    </p>
                 </div>
             </div>
 
-            <div className='max-w-7xl mx-auto px-6 flex flex-col md:flex-row gap-16 pb-24'>
+            <div className='max-w-7xl mx-[300px] px-6 flex flex-col md:flex-row gap-16 pb-24'>
                 {/* SIDEBAR */}
                 <aside className='w-full md:w-64 space-y-12'>
                     <div className='space-y-6'>
@@ -53,6 +57,17 @@ const ShopPage = () => {
                         </div>
                     </div>
 
+                    <div className='space-y-6'>
+                        <h4 className='text-xs font-bold uppercase tracking-[0.2em] border-b border-black pb-2'>Giá Sản Phẩm</h4>
+                        <div className='flex flex-col gap-4 text-xs uppercase tracking-widest text-gray-500'>
+                            <button className='text-left hover:text-black transition-colors'>Giá dưới 100.000đ</button >
+                            <button className='text-left hover:text-black transition-colors'>100.000đ - 200.000đ</button>
+                            <button className='text-left hover:text-black transition-colors'>200.000đ - 300.000đ</button>
+                            <button className='text-left hover:text-black transition-colors'>500.000đ - 1.000.000đ</button>
+                            <button className='text-left hover:text-black transition-colors'>Giá trên 1.000.000đ</button>
+                        </div>
+                    </div>
+
                 </aside>
 
                 {/* 2. PRODUCT GRID */}
@@ -66,7 +81,7 @@ const ShopPage = () => {
                         </select>
                     </div>
                     {/* SẢN PHẨM */}
-                    <div className='grid grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-12'>
+                    <div className='grid grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-12'>
                         {mockProducts.map((item) => (
                             <ProductCard key={item.id} product={item} />
                         ))}
