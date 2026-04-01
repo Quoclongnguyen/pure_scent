@@ -13,10 +13,10 @@ const Navbar = () => {
                 {/* Menu chính */}
                 <ul className="flex gap-8 items-center cursor-pointer ">
                     <li className=' hover:font-semibold transition-all duration-300'><Link to="/">Trang chủ</Link></li>
-                    <li className=' hover:font-semibold transition-all duration-300'><Link to="/shop">Cửa hàng</Link></li>
-                    <li className=' hover:font-semibold transition-all duration-300'><Link to="/about">Thương hiệu</Link></li>
-                    <li className=' hover:font-semibold transition-all duration-300'><Link to="/about">Nước Hoa</Link></li>
-                    <li className=' hover:font-semibold transition-all duration-300'><Link to="/about">Liên hệ</Link></li>
+                    <li className=' hover:font-semibold transition-all duration-300'><Link to="/about">Về chúng tôi</Link></li>
+                    <li className=' hover:font-semibold transition-all duration-300'><Link to="/brand">Thương hiệu</Link></li>
+                    <li className=' hover:font-semibold transition-all duration-300'><Link to="/shop">Nước Hoa</Link></li>
+                    <li className=' hover:font-semibold transition-all duration-300'><Link to="/contact">Liên hệ</Link></li>
                 </ul>
                 {/* Icons tiện ích */}
                 <div className="flex gap-5 items-center cursor-pointer">
@@ -24,10 +24,10 @@ const Navbar = () => {
                     <Link to="/login">
                         <User size={20} strokeWidth={1.5} />
                     </Link>
-                    <div className="relative">
+                    <Link to="/cart" className="relative">
                         <ShoppingCart size={20} strokeWidth={1.5} />
-                        <span className="absolute -top-2 -right-2 bg-black text-white text-[10px] w-4 h-4 rounded-full flex justify-center items-center">0</span>
-                    </div>
+                        <span className="absolute -top-2 -right-2 bg-black text-white text-[10px] w-4 h-4 rounded-full flex justify-center items-center">2</span>
+                    </Link>
                 </div>
             </div>
         </nav>

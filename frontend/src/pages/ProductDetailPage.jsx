@@ -130,6 +130,7 @@ const ProductDetailPage = () => {
                         </div>
                     </div>
 
+
                     {/* Quantity & Actions */}
                     <div className="space-y-8 pt-6">
                         <div className="flex items-center gap-8">
