@@ -11,6 +11,7 @@ import CartPage from './pages/CartPage'
 import CheckoutPage from './pages/CheckoutPage'
 import RegisterPage from './pages/RegisterPage'
 import AdminLayout from './pages/admin/AdminLayout'
+import AdminProductPage from './pages/admin/AdminProductPage'
 
 function App() {
 
@@ -54,7 +55,7 @@ function App() {
             element={<div className="text-xl font-serif">Chào mừng quay lại, Admin</div>} />
           <Route
             path='products'
-            element={<div>Quản lý sản phẩm</div>} />
+            element={<AdminProductPage />} />
           <Route
             path='orders'
             element={<div>Quản lý đơn hàng</div>} />
