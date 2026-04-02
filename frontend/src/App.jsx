@@ -9,6 +9,7 @@ import BrandPage from './pages/BrandPage'
 import ProductDetailPage from './pages/ProductDetailPage'
 import CartPage from './pages/CartPage'
 import CheckoutPage from './pages/CheckoutPage'
+import RegisterPage from './pages/RegisterPage'
 
 function App() {
 
@@ -45,6 +46,10 @@ function App() {
         <Route
           path='/login'
           element={<LoginPage />} />
+
+        <Route
+          path='/register'
+          element={<RegisterPage />} />
       </Routes>
       <Footer />
 
