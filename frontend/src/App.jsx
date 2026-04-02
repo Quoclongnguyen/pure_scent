@@ -10,6 +10,7 @@ import ProductDetailPage from './pages/ProductDetailPage'
 import CartPage from './pages/CartPage'
 import CheckoutPage from './pages/CheckoutPage'
 import RegisterPage from './pages/RegisterPage'
+import AdminLayout from './pages/admin/AdminLayout'
 
 function App() {
 
@@ -50,6 +51,26 @@ function App() {
         <Route
           path='/register'
           element={<RegisterPage />} />
+
+
+
+        {/* Admin Routes */}
+        <Route
+          path='/admin'
+          element={<AdminLayout />}>
+          <Route
+            path='dashboard'
+            element={<div className="text-xl font-serif">Chào mừng quay lại, Admin</div>} />
+          <Route
+            path='products'
+            element={<div>Quản lý sản phẩm</div>} />
+          <Route
+            path='orders'
+            element={<div>Quản lý đơn hàng</div>} />
+          <Route
+            path='categories'
+            element={<div>Quản lý danh mục</div>} />
+        </Route>
       </Routes>
       <Footer />
 
