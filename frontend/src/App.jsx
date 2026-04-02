@@ -12,6 +12,7 @@ import CheckoutPage from './pages/CheckoutPage'
 import RegisterPage from './pages/RegisterPage'
 import AdminLayout from './pages/admin/AdminLayout'
 import AdminProductPage from './pages/admin/AdminProductPage'
+import AdminOrderPage from './pages/admin/AdminOrderPage'
 
 function App() {
 
@@ -58,7 +59,7 @@ function App() {
             element={<AdminProductPage />} />
           <Route
             path='orders'
-            element={<div>Quản lý đơn hàng</div>} />
+            element={<AdminOrderPage />} />
           <Route
             path='categories'
             element={<div>Quản lý danh mục</div>} />

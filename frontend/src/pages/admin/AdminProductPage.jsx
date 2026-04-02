@@ -20,7 +20,7 @@ const AdminProductPage = () => {
                 </div>
                 <button
                     onClick={() => setIsModalOpen(true)}
-                    className="bg-black text-white px-6 py-3 text-[12px] uppercase font-bold tracking-widest flex items-center gap-2 hover:bg-gray-800 transition-all cursor-pointer">
+                    className="bg-gray-500 text-white  px-6 py-3 text-[12px] uppercase font-bold tracking-widest flex items-center gap-2 hover:bg-gray-800 transition-all cursor-pointer">
 
                     <Plus size={16} /> Thêm sản phẩm mới
                 </button>
@@ -42,7 +42,7 @@ const AdminProductPage = () => {
                     <tbody className="divide-y divide-gray-50">
                         {products.map(product => (
                             <tr key={product.id} className="hover:bg-gray-50/50 transition-colors">
-                                <td className="p-6"><img src={product.img} className="w-12 h-12 object-cover grayscale-0" /></td>
+                                <td className="p-6"><img src={product.img} className="w-12 h-12 object-cover grayscale-25" /></td>
                                 <td className="p-6 text-sm font-bold">{product.name}</td>
                                 <td className="p-6 text-xs text-gray-500 uppercase tracking-widest">{product.category}</td>
                                 <td className="p-6 text-sm font-medium">{product.price.toLocaleString()}đ</td>
