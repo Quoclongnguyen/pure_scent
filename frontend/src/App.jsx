@@ -1,5 +1,5 @@
 
-import { Route, Routes } from 'react-router-dom'
+import { Outlet, Route, Routes } from 'react-router-dom'
 import HomePage from './pages/HomePage'
 import LoginPage from './pages/LoginPage'
 import Navbar from './components/navbar/Navbar'
@@ -17,41 +17,32 @@ function App() {
 
   return (
     <>
-      <Navbar />
       <Routes>
+        <Route element={
+          <>
+            <Navbar />
+            <Outlet />
+            <Footer />
+          </>
+        } >
 
-        <Route
-          path='/'
-          element={<HomePage />} />
+          <Route path='/' element={<HomePage />} />
 
-        <Route
-          path='/shop'
-          element={<ShopPage />} />
+          <Route path='/shop' element={<ShopPage />} />
 
-        <Route
-          path='/brand'
-          element={<BrandPage />} />
+          <Route path='/brand' element={<BrandPage />} />
 
-        <Route
-          path='/product/:id'
-          element={<ProductDetailPage />} />
+          <Route path='/product/:id' element={<ProductDetailPage />} />
 
-        <Route
-          path='/cart'
-          element={<CartPage />} />
+          <Route path='/cart' element={<CartPage />} />
 
-        <Route
-          path='/checkout'
-          element={<CheckoutPage />} />
+          <Route path='/checkout' element={<CheckoutPage />} />
 
-        <Route
-          path='/login'
-          element={<LoginPage />} />
+          <Route path='/login' element={<LoginPage />} />
 
-        <Route
-          path='/register'
-          element={<RegisterPage />} />
+          <Route path='/register' element={<RegisterPage />} />
 
+        </Route>
 
 
         {/* Admin Routes */}
@@ -72,7 +63,7 @@ function App() {
             element={<div>Quản lý danh mục</div>} />
         </Route>
       </Routes>
-      <Footer />
+
 
 
 
