@@ -13,6 +13,7 @@ import RegisterPage from './pages/RegisterPage'
 import AdminLayout from './pages/admin/AdminLayout'
 import AdminProductPage from './pages/admin/AdminProductPage'
 import AdminOrderPage from './pages/admin/AdminOrderPage'
+import AdminCategoryPage from './pages/admin/AdminCategoryPage'
 
 function App() {
 
@@ -62,7 +63,7 @@ function App() {
             element={<AdminOrderPage />} />
           <Route
             path='categories'
-            element={<div>Quản lý danh mục</div>} />
+            element={<AdminCategoryPage />} />
         </Route>
       </Routes>
 
