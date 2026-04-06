@@ -1,22 +1,29 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom';
 import ProductCard from '../components/productCard/ProductCard'
-import Footer from '../components/footer/Footer';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import api from '../utils/Axios.js'
 
-const mockProducts = [
-    { id: 1, name: "Santal 33", brand: "Le Labo", gender: "Unisex", price: "5.500.000đ", image: "/src/assets/img1.png" },
-    { id: 2, name: "Another 13", brand: "Le Labo", gender: "Men", price: "5.200.000đ", image: "/src/assets/img1.png" },
-    { id: 3, name: "Rose 31", brand: "Le Labo", gender: "Women", price: "4.800.000đ", image: "/src/assets/img1.png" },
-    { id: 5, name: "Lys 41", brand: "Le Labo", gender: "Women", price: "5.000.000đ", image: "/src/assets/img1.png" },
-    { id: 6, name: "Lys 41", brand: "Le Labo", gender: "Men", price: "5.000.000đ", image: "/src/assets/img1.png" },
-    { id: 7, name: "Lys 41", brand: "Le Labo", gender: "Women", price: "5.000.000đ", image: "/src/assets/img1.png" },
-    { id: 8, name: "Lys 41", brand: "Le Labo", gender: "Men", price: "5.000.000đ", image: "/src/assets/img1.png" },
-    { id: 9, name: "Lys 41", brand: "Le Labo", gender: "Men", price: "5.000.000đ", image: "/src/assets/img1.png" },
-
-];
 const ShopPage = () => {
+    const [products, setProduct] = useState([])
+    const [loading, setLoading] = useState(true)
+    useEffect(() => {
+        const fetchProduct = async () => {
+            try {
+                const res = await api.get('api/products')
+                setProduct(res.data)
+                setLoading(false)
+            } catch (error) {
+                console.error("Lỗi khi Get sản phẩm: ", error)
+                setLoading(false)
+            }
+        }
+        fetchProduct()
+    }, [])
+    if (loading)
+        return <div className="p-20 text-center font-serif text-xl">Đang tải sản phẩm...</div>
     return (
+
         <main className='min-h-screen bg-white'>
 
             <div className='bg-[#f9f9f9] py-8 border-b border-gray-100 mb-12'>
@@ -82,8 +89,8 @@ const ShopPage = () => {
                     </div>
                     {/* SẢN PHẨM */}
                     <div className='grid grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-12'>
-                        {mockProducts.map((item) => (
-                            <ProductCard key={item.id} product={item} />
+                        {products.map((item) => (
+                            <ProductCard key={item._id} product={item} />
                         ))}
                     </div>
 
