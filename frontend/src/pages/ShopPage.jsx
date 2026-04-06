@@ -8,9 +8,9 @@ const ShopPage = () => {
     const [products, setProduct] = useState([])
     const [loading, setLoading] = useState(true)
     useEffect(() => {
-        const fetchProduct = async () => {
+        const fetchProducts = async () => {
             try {
-                const res = await api.get('api/products')
+                const res = await api.get('/api/products')
                 setProduct(res.data)
                 setLoading(false)
             } catch (error) {
@@ -18,7 +18,7 @@ const ShopPage = () => {
                 setLoading(false)
             }
         }
-        fetchProduct()
+        fetchProducts()
     }, [])
     if (loading)
         return <div className="p-20 text-center font-serif text-xl">Đang tải sản phẩm...</div>
