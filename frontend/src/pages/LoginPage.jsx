@@ -1,16 +1,43 @@
-import React, { useState } from 'react'
-import { Link } from 'react-router-dom'
+import React, { useContext, useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
 import { Eye, EyeOff, Mail, Lock, ArrowRight } from 'lucide-react'
+import AuthContext from '../context/AuthContext';
+import api from '../utils/Axios.js'
 
 const LoginPage = () => {
     const [showPassword, setShowPassword] = useState(false);
+    const [error, setError] = useState('')
     const [formData, setFormData] = useState({
         email: '',
         password: ''
     });
 
+    const { login } = useContext(AuthContext)
+    const navigate = useNavigate()
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
+    };
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setError('');
+
+        try {
+
+            const res = await api.post('/api/users/login', {
+
+                email: formData.email,
+                password: formData.password
+            });
+
+
+            login(res.data);
+            alert("Đăng nhập thành công!");
+            navigate('/');
+
+        } catch (error) {
+
+            setError(error.response?.data?.message || "Đã có lỗi xảy ra!");
+        }
     };
 
     return (
@@ -29,7 +56,7 @@ const LoginPage = () => {
 
 
                 {/* Form */}
-                <form className="space-y-8">
+                <form className="space-y-8" onSubmit={handleSubmit}>
                     <div className="space-y-6">
 
                         <div className="relative group">
@@ -72,6 +99,7 @@ const LoginPage = () => {
                             </div>
                         </div>
                     </div>
+                    {error && <p className="text-red-500 text-[11px] text-center mb-4 italic">{error}</p>}
 
                     {/* Submit Button */}
                     <button className="w-full bg-black text-white py-5 text-[10px] font-bold uppercase tracking-[0.4em] hover:bg-gray-800 transition-all flex items-center justify-center gap-3 group cursor-pointer shadow-xl shadow-black/5">
