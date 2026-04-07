@@ -50,6 +50,9 @@ function App() {
           <Route path='/register' element={<RegisterPage />} />
 
           <Route path='/profile' element={<div className="p-20 text-center font-serif text-2xl">Đang tiến hành</div>} />
+          <Route path='//about' element={<div className="p-20 text-center font-serif text-2xl">Đang tiến hành</div>} />
+          <Route path='//contact' element={<div className="p-20 text-center font-serif text-2xl">Đang tiến hành</div>} />
+
 
           <Route path='/unauthorized' element={
             <div className="min-h-[60vh] flex flex-col items-center justify-center p-10 text-center space-y-6">

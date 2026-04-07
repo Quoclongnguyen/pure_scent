@@ -1,10 +1,13 @@
 import { Edit2, Plus, Trash2, X } from 'lucide-react'
 import React, { useEffect, useState } from 'react'
 import api from '../../utils/Axios.js'
+const BACKEND_URL = 'http://localhost:3001'
 const AdminProductPage = () => {
     const [isModalOpen, setIsModalOpen] = useState(false)
     const [products, setProducts] = useState([])
     const [loading, setLoading] = useState(true)
+    const [selectedFiles, setSelectedFiles] = useState([]) // Lưu các file thật để gửi lên Server
+    const [imagePreviews, setImagePreviews] = useState([]) // Lưu đường dẫn
     const [formData, setFormData] = useState({
         name: '',
         brand: '',
@@ -36,10 +39,34 @@ const AdminProductPage = () => {
 
     const hanldeSubmit = async (e) => {
         e.preventDefault()
+        setLoading(true)
         try {
-            await api.post('/api/products', formData)
+
+            let uploadedImages = []
+            if (selectedFiles.length > 0) {
+                const formDataUpload = new FormData()
+                selectedFiles.forEach(file => {
+                    formDataUpload.append('images', file)
+                })
+
+
+                const response = await api.post('/api/upload', formDataUpload, {
+                    headers: { 'Content-Type': 'multipart/form-data' }
+                })
+
+                uploadedImages = response.data
+            }
+
+            const productData = {
+                ...formData,
+                images: uploadedImages.length > 0 ? uploadedImages : formData.images
+            }
+            await api.post('/api/products', productData);
+
+
             setIsModalOpen(false)
             fetchProducts()
+            alert("Thêm sản phẩm thành công");
             setFormData({
                 name: '',
                 brand: '',
@@ -49,12 +76,34 @@ const AdminProductPage = () => {
                 stock: 10,
                 images: ['']
             })
-            alert('Thêm sản phẩm thành công')
+
         } catch (error) {
             console.error("Lỗi khi thêm sản phẩm:", error);
             alert("Có lỗi xảy ra, vui lòng kiểm tra lại!");
+        } finally {
+            setLoading(false);
         }
     }
+
+    //  Hàm chọn file từ máy tính
+    const handleFileChange = (e) => {
+        const files = Array.from(e.target.files);
+
+        // Tạo link xem trước (ObjectURL)
+        const newPreviews = files.map(file => URL.createObjectURL(file));
+
+        setImagePreviews(prev => [...prev, ...newPreviews].slice(0, 5)); // Ghép vào ảnh cũ, tối đa 5
+        setSelectedFiles(prev => [...prev, ...files].slice(0, 5));
+    };
+
+    // xóa ảnh đã chọn
+    const removeImage = (index) => {
+        setImagePreviews(prev =>
+            prev.filter((_, i) => i !== index));
+        setSelectedFiles(prev =>
+            prev.filter((_, i) => i !== index));
+    };
+
 
     if (loading) return <p>Loading...</p>
     return (
@@ -94,13 +143,22 @@ const AdminProductPage = () => {
                             <tr key={product._id} className="hover:bg-gray-50/50 transition-colors">
                                 <td className="p-6">
 
-                                    <img // Nếu ảnh không bắt đầu bằng http và không có dấu / ở đầu, thì tự thêm / vào
-                                        src={product.images?.[0]?.startsWith('http') || product.images?.[0].startsWith('/')
-                                            ? product.images[0]
-                                            : `/${product.images[0]}`
+                                    <img
+                                        src={
+                                            product.images?.[0]?.startsWith('http')
+                                                ? product.images[0] // Nếu là link web (http) -> Giữ nguyên
+                                                : product.images?.[0].startsWith('/uploads')
+                                                    ? `${BACKEND_URL}${product.images[0]}` //Nếu là ảnh vừa upload  -> Thêm cổng 3001
+                                                    : product.images[0]  // Nếu là ảnh mẫu (/src/assets)
                                         }
+
+
+                                        onError={(e) => {
+                                            e.target.onerror = null;
+                                            e.target.src = 'https://placehold.co/100x100?text=No+Image'
+                                        }}  // Ảnh dự phòng nếu lỗi
+
                                         className="w-12 h-12 object-cover grayscale-25"
-                                        onError={(e) => { e.target.src = 'https://via.placeholder.com/100'; }} // Ảnh dự phòng nếu lỗi
                                     />
                                 </td>
                                 <td className="p-6 text-sm font-bold">
@@ -126,7 +184,7 @@ const AdminProductPage = () => {
             {isModalOpen && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 backdrop-blur-sm p-4 animate-in fade-in duration-300">
                     <div className="bg-white w-full max-w-xl shadow-2xl p-10 relative animate-in zoom-in-95 duration-300">
-                        {/* Nội dung Modal sẽ viết ở đây */}
+
 
                         <button onClick={() =>
                             setIsModalOpen(false)}
@@ -137,7 +195,7 @@ const AdminProductPage = () => {
                             Thêm sản phẩm mới</h2>
 
 
-                        {/* Form nhập liệu tạm thời */}
+
                         <form onSubmit={hanldeSubmit} className="space-y-6">
 
                             <div className='grid grid-cols-2 gap-5'>
@@ -193,21 +251,50 @@ const AdminProductPage = () => {
                                     />
                                 </div>
 
-                                <div>
-                                    <label className="text-[10px] uppercase tracking-widest font-bold text-gray-400">
-                                        Link hình ảnh
+                                {/*Hình ảnh */}
+                                <div className='col-span-2'>
+                                    <label className="text-[10px] uppercase tracking-widest font-bold text-gray-400 mb-4">
+                                        Hình ảnh sản phẩm (Tối đa 5 ảnh)
                                     </label>
-                                    <input
-                                        type="text"
-                                        required
-                                        placeholder="VD: /src/assets/img1.png"
-                                        value={formData.images[0]}
-                                        onChange={(e) => setFormData({ ...formData, images: [e.target.value] })}
-                                        className="w-full border-b border-gray-100 py-2 focus:outline-none focus:border-black transition-colors text-[12px]"
-                                    />
+                                    <div className='flex flex-wrap gap-4'>
+                                        {imagePreviews.map((url, index) => (
+                                            <div key={index} className='relative w-24 h-24 group border border-gray-400'>
+                                                <img src={url} className='w-ful h-full object-cover' />
+                                                <button
+                                                    className='absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer shadow-lg'
+                                                    type='button'
+                                                    onClick={() => removeImage(index)}
+                                                >    <X size={12} /></button>
+                                            </div>
+                                        ))}
+                                        {imagePreviews.length < 5 && (
+                                            <label className="w-24 h-24 border-2 border-dashed border-gray-100 flex flex-col items-center justify-center text-gray-300 hover:border-black hover:text-black transition-all cursor-pointer">
+                                                <Plus size={24} strokeWidth={1} />
+                                                <span className="text-[8px] uppercase mt-2 font-bold tracking-tighter">Thêm ảnh</span>
+                                                <input
+                                                    type="file"
+                                                    multiple
+                                                    accept="image/*"
+                                                    className="hidden"
+                                                    onChange={handleFileChange}
+                                                />
+                                            </label>
+                                        )}
+
+                                        <div className='mt-4 border-t border-gray-50 pt-4'>
+                                            <label className='text-[10px] uppercase tracking-widest font-bold text-gray-400 mb-2 block'>Hoặc dán link ảnh từ bên ngoài (URL)</label>
+                                            <input type="text" placeholder='Dán link http://... vào đây' value={selectedFiles.length === 0
+                                                ? formData.images[0]
+                                                : ""
+                                            }
+                                                onChange={(e) => setFormData({ ...formData, images: [e.target.value] })}
+                                                className='w-full border-b border-gray-100 py-2 focus:outline-none focus:border-black transition-colors text-[12px] italic text-gray-500' />
+                                            <p className='text-[9px] text-gray-300 mt-1'>*Ưu tiên ảnh bạn đã chọn từ máy tính nếu có</p>
+                                        </div>
+                                    </div>
                                 </div>
 
-                                <div>
+                                <div className='col-span-2'>
                                     <label className="text-[10px] uppercase tracking-widest font-bold text-gray-400">
                                         ID Danh mục (Category ID)
                                     </label>

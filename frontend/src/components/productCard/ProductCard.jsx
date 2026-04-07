@@ -9,7 +9,10 @@ const ProductCard = ({ product }) => {
 
             <Link to={`/product/${product._id}`} className='relative aspect-[4/5] block overflow-hidden bg-[#fcfcfc] Overlay'>
                 <img
-                    src={product.images?.[0]}
+                    src={product.images?.[0].startsWith('http')
+                        ? product.images[0]
+                        : `http://localhost:3001${product.images?.[0]}`
+                    }
                     alt={product.name}
                     className='w-full h-full object-cover group-hover:scale-110 transition-transform duration-700'
                 />
