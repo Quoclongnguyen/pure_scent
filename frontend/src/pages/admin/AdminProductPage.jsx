@@ -76,7 +76,8 @@ const AdminProductPage = () => {
                 stock: 10,
                 images: ['']
             })
-
+            setSelectedFiles([]); // Xóa file đã chọn
+            setImagePreviews([]);
         } catch (error) {
             console.error("Lỗi khi thêm sản phẩm:", error);
             alert("Có lỗi xảy ra, vui lòng kiểm tra lại!");
@@ -104,6 +105,17 @@ const AdminProductPage = () => {
             prev.filter((_, i) => i !== index));
     };
 
+    const hanldeDelete = async (id) => {
+        try {
+            if (window.confirm('Xác nhận xóa sản phẩm')) {
+                await api.delete(`/api/products/${id} `)
+            }
+            fetchProducts()
+            alert('Bạn đã xóa thành công')
+        } catch (error) {
+            console.error("Lỗi khi xóa sản phẩm: ", error)
+        }
+    }
 
     if (loading) return <p>Loading...</p>
     return (
@@ -148,7 +160,7 @@ const AdminProductPage = () => {
                                             product.images?.[0]?.startsWith('http')
                                                 ? product.images[0] // Nếu là link web (http) -> Giữ nguyên
                                                 : product.images?.[0].startsWith('/uploads')
-                                                    ? `${BACKEND_URL}${product.images[0]}` //Nếu là ảnh vừa upload  -> Thêm cổng 3001
+                                                    ? `${BACKEND_URL}${product.images[0]} ` //Nếu là ảnh vừa upload  -> Thêm cổng 3001
                                                     : product.images[0]  // Nếu là ảnh mẫu (/src/assets)
                                         }
 
@@ -169,7 +181,7 @@ const AdminProductPage = () => {
                                 <td className="p-6 text-right">
                                     <div className="flex justify-end gap-4">
                                         <button className="text-gray-400 hover:text-black transition-colors"><Edit2 size={16} /></button>
-                                        <button className="text-gray-400 hover:text-red-500 transition-colors"><Trash2 size={16} /></button>
+                                        <button onClick={() => hanldeDelete(product._id)} className="text-gray-400 hover:text-red-500 transition-colors"><Trash2 size={16} /></button>
                                     </div>
 
                                 </td>
@@ -316,7 +328,7 @@ const AdminProductPage = () => {
                                     Mô tả sản phẩm
                                 </label>
                                 <textarea
-
+                                    required
                                     placeholder="Mô tả ngắn gọn về hương thơm..."
                                     value={formData.description}
                                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}

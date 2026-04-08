@@ -1,5 +1,7 @@
 import express from "express";
 import dotenv from "dotenv";
+dotenv.config();
+
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import connectDB from "./config/db.js";
@@ -8,8 +10,9 @@ import productRouters from "./routes/productRouters.js"
 import categoryRouters from "./routes/categoryRouters.js"
 import path from "path"
 import uploadRoutes from './routes/uploadRoutes.js'
-dotenv.config();
 
+const app = express();
+const PORT = process.env.PORT || 3001;
 // Connect to MongoDB
 connectDB().then(() => {
   app.listen(PORT, () => {
@@ -20,7 +23,7 @@ connectDB().then(() => {
   process.exit(1);
 });
 
-const app = express();
+
 
 //uploadImg
 const __dirname = path.resolve()
@@ -45,5 +48,5 @@ app.get("/", (req, res) => {
   res.send("PureScent API is running...");
 });
 
-const PORT = process.env.PORT || 3001;
+
 

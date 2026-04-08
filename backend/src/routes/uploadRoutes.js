@@ -2,17 +2,23 @@ import path from "path"
 import express from "express"
 import multer from "multer"
 
+import { CloudinaryStorage } from "multer-storage-cloudinary"
+import cloudinary from "../config/cloudinary.js";
+
 const router = express.Router()
 
-const storage = multer.diskStorage({ //Lưu file vào ổ cứng
-    destination(req, file, cb) {
-        cb(null, 'uploads/')
-    },
-    filename(req, file, cb) {
-        cb(
-            null,
-            `${file.fieldname}-${Date.now()}${path.extname(file.originalname)}`
-        )
+
+const storage = new CloudinaryStorage({
+    cloudinary: cloudinary,
+    params: {
+        folder: "pure_scent_products", // Thư mục lưu trên Cloudinary
+        allowed_formats: ["jpg", "png", "jpeg", "webp"],
+        public_id: (req, file) => {
+            // tạo tên file duy nhất
+
+            const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9) // công thức tạo mã định danh duy nhất 
+            return `product-${uniqueSuffix}`
+        }
     }
 })
 
@@ -29,22 +35,28 @@ function checkFileTypes(file, cb) {
 }
 
 const upload = multer({
-    storage,
-    fileFilter: function (req, file, cb) {
-        checkFileTypes(file, cb)
-    }
+    storage: storage
 })
 
 // API xử lý upload nhiều ảnh
-router.post('/', upload.array('images', 5), (req, res) => {
-    if (!req.files || req.files.length === 0) {
-        return res.status(400).send({ message: 'Không có file nào được chọn' })
-    }
+router.post('/', (req, res, next) => {
+    upload.array('images', 5)(req, res, (err) => {
+        if (err) {
+            console.error("Lỗi liên quan đến CLOUDINARY/MULTER:", err)
+            return res.status(500).json({ message: err.message || "Lỗi upload ảnh" })
+        }
+        if (!req.files || req.files.length === 0) {
+            return res.status(400).send({ message: 'Không có file nào được chọn' })
+        }
 
-    // Trả về mảng các đường dẫn ảnh đã lưu
-    const paths = req.files.map((file) =>
-        `/${file.path.replace(/\\/g, "/")}`)
-    res.send(paths)
+        // Cloudinary sẽ trả về full URL trong trường path(hoặc secure_url)
+        const paths = req.files.map((file) => file.path)
+        console.log("Upload thành công:", paths)
+        return res.status(200).send(paths)
+    })
+
+
+
 })
 
 

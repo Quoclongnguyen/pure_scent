@@ -1,34 +1,48 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { ShoppingBag, ChevronRight, ChevronLeft, Star, Heart } from 'lucide-react'
 import ProductCard from '../components/productCard/ProductCard'
-
-// Mock data cho demo
-const mockProducts = [
-    {
-        id: 1,
-        name: "Santal 33",
-        brand: "Le Labo",
-        price: "5.500.000đ",
-        image: "/src/assets/img1.png",
-        description: "An open fire. The soft drift of smoke. Where sensuality rises after the light has gone. Santal 33 là biểu tượng của tinh thần tự do và sự sáng tạo không giới hạn.",
-        notes: {
-            top: "Violet Accord, Cardamom",
-            heart: "Iris, Ambrox",
-            base: "Cedarwood, Leather, Sandalwood"
-        },
-        sizes: ["50ml", "100ml"]
-    },
-    //dùng mock này cho trang chi tiết
-];
+import { getImageUrl } from '../utils/helpers';
+import api from '../utils/Axios.js'
 
 const ProductDetailPage = () => {
-    const { id } = useParams();
-    const [selectedSize, setSelectedSize] = useState("50ml");
+    const { id } = useParams()
+    const [product, setProduct] = useState(null)
+    const [products, setProducts] = useState([])
     const [quantity, setQuantity] = useState(1);
+    const [activeIndex, setActiveIndex] = useState('')
+    const [loading, setLoading] = useState(true)
 
-    // Lấy product (trong thực tế sẽ fetch từ API theo id)
-    const product = mockProducts[0];
+    const fetchProduct = async () => {
+        try {
+            const { data } = await api.get(`/api/products/${id}`)
+            setProduct(data)
+            setActiveIndex(0) // mặc định hiển thị ảnh đầu tiên
+        } catch (error) {
+            console.error('Lỗi khi lấy chi tiết sản phẩm ', error)
+        } finally {
+            setLoading(false)
+        }
+    }
+
+    const fetchProducts = async () => {
+        try {
+            const res = await api.get('/api/products')
+            setProducts(res.data)
+            setLoading(false)
+        } catch (error) {
+            console.error("Lỗi khi Get sản phẩm: ", error)
+            setLoading(false)
+        }
+    }
+    useEffect(() => {
+        fetchProduct()
+        fetchProducts()
+    }, [])
+
+    if (!product) {
+        return <div className="min-h-screen flex items-center justify-center uppercase tracking-widest text-xs">Đang tải...</div>;
+    }
 
     return (
         <main className="min-h-screen bg-white pb-24">
@@ -48,9 +62,9 @@ const ProductDetailPage = () => {
 
                 {/* 1. Image Gallery */}
                 <div className="space-y-4">
-                    <div className="aspect-[4/5] bg-[#fcfcfc] overflow-hidden rounded-[4px] relative group">
+                    <div className="relative aspect-[4/5]  w-full bg-[#fcfcfc] overflow-hidden rounded-sm group ">
                         <img
-                            src={product.image}
+                            src={getImageUrl(product.images?.[activeIndex])}
                             alt={product.name}
                             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                         />
@@ -58,15 +72,23 @@ const ProductDetailPage = () => {
                             <Heart size={18} strokeWidth={1} />
                         </button>
                     </div>
-                    {/* Thumbnails (nếu có nhiều ảnh) */}
-                    <div className="grid grid-cols-4 gap-4">
-                        <div className="aspect-square bg-gray-50 border border-black p-2 cursor-pointer">
-                            <img src={product.image} alt="thumb" className="w-full h-full object-contain opacity-100" />
-                        </div>
-                        {/* Placeholder thumbs */}
-                        {[1, 2, 3].map((i) => (
-                            <div key={i} className="aspect-square bg-gray-50 hover:bg-gray-100 transition-colors cursor-pointer opacity-50 hover:opacity-100"></div>
-                        ))}
+
+                    <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide mt-4">
+                        {product.images?.map((img, index) =>
+                            <div
+                                key={index}
+                                onClick={() => setActiveIndex(index)}
+                                className={`flex-shrink-0 w-20 aspect-[4/5] bg-gray-50 border transition-all duration-300 cursor-pointer
+                            ${activeIndex === index ? 'border-black' : 'border-gray-100 opacity-60 hover:opacity-100'} `}
+                            >
+                                <img src={getImageUrl(img)}
+                                    alt="thumb"
+                                    className="w-full h-full object-cover opacity-100" />
+                            </div>
+                        )}
+
+
+
                     </div>
                 </div>
 
@@ -92,7 +114,7 @@ const ProductDetailPage = () => {
 
 
 
-                    <div className="grid grid-cols-3 gap-6 py-8 border-y border-gray-50">
+                    {/* <div className="grid grid-cols-3 gap-6 py-8 border-y border-gray-50">
                         <div className="space-y-2">
                             <h4 className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Top</h4>
                             <p className="text-sm font-medium">{product.notes.top}</p>
@@ -105,7 +127,7 @@ const ProductDetailPage = () => {
                             <h4 className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Base</h4>
                             <p className="text-sm font-medium">{product.notes.base}</p>
                         </div>
-                    </div>
+                    </div> */}
 
 
 
@@ -115,7 +137,7 @@ const ProductDetailPage = () => {
                             Chọn dung tích
                         </label>
                         <div className="flex gap-4">
-                            {product.sizes.map((size) => (
+                            {product.sizes?.map((size) => (
                                 <button
                                     key={size}
                                     onClick={() => setSelectedSize(size)}
@@ -186,10 +208,11 @@ const ProductDetailPage = () => {
                     Có thể bạn cũng thích
                 </h2>
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-10">
-                    {/* Reuse ProductCard with some dummy data */}
-                    {[1, 2, 3, 4].map((i) => (
-                        <div key={i} className="opacity-80 hover:opacity-100 transition-opacity">
-                            <ProductCard product={{ id: i, name: "Sample Scent", brand: "PureScent", price: "2.000.000đ", image: "/src/assets/img1.png" }} />
+
+
+                    {products.map((item) => (
+                        <div key={item._id} className="opacity-80 hover:opacity-100 transition-opacity">
+                            <ProductCard product={item} />
                         </div>
                     ))}
                 </div>

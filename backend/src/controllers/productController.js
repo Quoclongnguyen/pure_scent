@@ -1,3 +1,4 @@
+import cloudinary from "../config/cloudinary.js";
 import Product from "../models/productModel.js";
 
 
@@ -71,16 +72,31 @@ const updateProduct = async (req, res) => {
 
 const deleteProduct = async (req, res) => {
     try {
-        const deleted = await Product.findByIdAndDelete(req.params.id)
-        if (deleted) {
-            res.status(200).json(deleted)
-        } else {
-            res.status(404).json({ message: "Lỗi khi xóa nước hoa" })
-
+        const product = await Product.findById(req.params.id)
+        if (!product) {
+            return res.status(404).json({ message: "Lỗi không tìm thấy sản phẩm " })
         }
+        //Xóa ảnh trên Cloudinary trước
+        if (product.images && product.images.length > 0) {
+            for (const imageUrl of product.images) {
+                // Nếu là ảnh từ Cloudinary (có chứa 'res.cloudinary.com')
+                if (imageUrl.includes('res.cloudinary.com')) {
+                    // Logic tách public_id: Lấy đoạn sau 'upload/' và bỏ phần định dạng (.jpg, .png)
+                    const parts = imageUrl.split('/')
+                    const fileName = parts[parts.length - 1].split('.')[0]
+                    const folderName = parts[parts.length - 2]
+                    const publicId = `${folderName}/${fileName}`
+
+                    await cloudinary.uploader.destroy(publicId)
+                    console.log("Đã xóa ảnh trên Cloudinary:", publicId)
+                }
+            }
+        }
+        await Product.findByIdAndDelete(req.params.id)
+        res.status(200).json({ message: "Xóa sản phẩm và ảnh thành công" })
     } catch (error) {
         console.error("Lỗi khi gọi deleteProduct", error)
-        res.status(400).json({ message: "Lỗi khi deleted nước hoa" })
+        res.status(400).json({ message: "Lỗi khi deleted nước hoa", error: error.message })
 
     }
 }
