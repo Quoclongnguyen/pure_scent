@@ -3,15 +3,21 @@ import { Link } from 'react-router-dom';
 import ProductCard from '../components/productCard/ProductCard'
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import api from '../utils/Axios.js'
+import Pagination from '../components/ui/Pagination.jsx';
 
 const ShopPage = () => {
     const [products, setProduct] = useState([])
     const [loading, setLoading] = useState(true)
+    const [page, setPage] = useState(1)
+    const [pages, setPages] = useState(1)
+
     useEffect(() => {
         const fetchProducts = async () => {
             try {
-                const res = await api.get('/api/products')
-                setProduct(res.data)
+                const res = await api.get(`/api/products?pageNumber=${page}`)
+                setProduct(res.data.products)
+                setPages(res.data.pages)
+                setPage(res.data.page)
                 setLoading(false)
             } catch (error) {
                 console.error("Lỗi khi Get sản phẩm: ", error)
@@ -19,7 +25,7 @@ const ShopPage = () => {
             }
         }
         fetchProducts()
-    }, [])
+    }, [page])
     if (loading)
         return <div className="p-20 text-center font-serif text-xl">Đang tải sản phẩm...</div>
     return (
@@ -80,7 +86,7 @@ const ShopPage = () => {
                 {/* 2. PRODUCT GRID */}
                 <div className='flex-1 space-y-8'>
                     <div className='flex justify-between items-center text-[15px] uppercase tracking-widest text-gray border-b border-gray-200 pb-2'>
-                        <p>Hiển thị {products.length} sản phẩm</p>
+                        <p>Hiển thị {products?.length} sản phẩm</p>
                         <select className='bg-transparent focus:outline-none text-back font-medium cursor-pointer'>
                             <option>Mới Nhất</option>
                             <option>Giá: Thấp đến cao</option>
@@ -95,20 +101,9 @@ const ShopPage = () => {
                     </div>
 
                     {/* PHÂN TRANG */}
-                    <div className='flex justify-center items-center gap-8 pt-16 border-t border-gray-100 mt-12 text-[10px] tracking-[0.2em] font-bold'>
-                        <button className='text-gray-300 hover:text-black transition-colors cursor-pointer'>
-                            <ChevronLeft size={20} strokeWidth={1.5} />
-                        </button>
-                        <div className='flex gap-6'>
-                            <span className='cursor-pointer text-black border-b border-black pb-1'>01</span>
-                            <span className='cursor-pointer text-gray-400 hover:text-black transition-colors'>02</span>
-                            <span className='cursor-pointer text-gray-400 hover:text-black transition-colors'>03</span>
-                            <span className='text-gray-400'>...</span>
-                            <span className='cursor-pointer text-gray-400 hover:text-black transition-colors'>39</span>
-                        </div>
-                        <button className='text-gray-300 hover:text-black transition-colors cursor-pointer'>
-                            <ChevronRight size={20} strokeWidth={1.5} />                        </button>
-                    </div>
+                    <Pagination page={page} pages={pages} setPage={setPage} />
+
+
                 </div>
             </div>
 

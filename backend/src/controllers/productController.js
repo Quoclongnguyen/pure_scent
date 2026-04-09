@@ -4,8 +4,25 @@ import Product from "../models/productModel.js";
 
 const getProducts = async (req, res) => {
     try {
-        const products = await Product.find({}).populate("category", "name")
-        res.json(products);
+        const pageSize = 8; // Số sản phẩm mỗi trang
+        const page = Number(req.query.pageNumber) || 1;
+        const count = await Product.countDocuments({});
+
+        const products = await Product
+            .find({})
+            .populate("category", "name")
+            .limit(pageSize)
+            .skip(pageSize * (page - 1))
+
+
+        res.json({
+            products,
+            page,
+            pages: Math.ceil(count / pageSize),
+            total: count
+        })
+
+
     } catch (error) {
         console.error("Lỗi khi gọi getProducts", error)
         res.status(400).json({ message: "Lỗi khi lấy danh sách nước hoa" })
