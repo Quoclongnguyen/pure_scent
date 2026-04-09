@@ -80,7 +80,7 @@ const ShopPage = () => {
                 {/* 2. PRODUCT GRID */}
                 <div className='flex-1 space-y-8'>
                     <div className='flex justify-between items-center text-[15px] uppercase tracking-widest text-gray border-b border-gray-200 pb-2'>
-                        <p>Hiển thị 6 sản phẩm</p>
+                        <p>Hiển thị {products.length} sản phẩm</p>
                         <select className='bg-transparent focus:outline-none text-back font-medium cursor-pointer'>
                             <option>Mới Nhất</option>
                             <option>Giá: Thấp đến cao</option>
