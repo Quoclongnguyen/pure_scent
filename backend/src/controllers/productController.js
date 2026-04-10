@@ -10,7 +10,7 @@ const getProducts = async (req, res) => {
 
         const products = await Product
             .find({})
-            .populate("category", "name")
+            .populate("category brand", "name")
             .limit(pageSize)
             .skip(pageSize * (page - 1))
 
@@ -32,7 +32,7 @@ const getProducts = async (req, res) => {
 
 const getProductById = async (req, res) => {
     try {
-        const product = await Product.findById(req.params.id).populate("category", "name")
+        const product = await Product.findById(req.params.id).populate("category brand", "name")
         if (product) {
             res.json(product)
 
@@ -47,9 +47,9 @@ const getProductById = async (req, res) => {
 
 const createProduct = async (req, res) => {
     try {
-        const { name, brand, category, description, price, stock, images } = req.body
+        const { name, brand, category, description, images, variants, scentNotes, specs } = req.body
         const product = await Product.create({
-            name, brand, category, description, price, stock, images
+            name, brand, category, description, images, variants, scentNotes, specs
 
         })
         res.status(201).json(product)
@@ -61,7 +61,7 @@ const createProduct = async (req, res) => {
 
 const updateProduct = async (req, res) => {
     try {
-        const { name, brand, category, description, price, stock, images } = req.body;
+        const { name, brand, category, description, images, variants, scentNotes, specs } = req.body;
 
         const product = await Product.findById(req.params.id);
 
@@ -74,12 +74,13 @@ const updateProduct = async (req, res) => {
         product.brand = brand || product.brand;
         product.category = category || product.category;
         product.description = description || product.description;
-        product.price = price !== undefined ? price : product.price; // Xử lý riêng cho số 0
-        product.stock = stock !== undefined ? stock : product.stock;
+        product.variants = variants !== undefined ? variants : product.variants; // Xử lý riêng cho số 0
+        product.scentNotes = scentNotes || product.scentNotes
+        product.specs = specs || product.specs
         product.images = images || product.images;
 
         const updatedProduct = await product.save();
-        res.status(200).json(updatedProduct);
+        res.status(201).json(updatedProduct);
 
     } catch (error) {
         console.error("Lỗi khi gọi updateProduct:", error.message);
