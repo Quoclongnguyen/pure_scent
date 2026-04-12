@@ -14,6 +14,7 @@ import AdminLayout from './pages/admin/AdminLayout'
 import AdminProductPage from './pages/admin/AdminProductPage'
 import AdminOrderPage from './pages/admin/AdminOrderPage'
 import AdminCategoryPage from './pages/admin/AdminCategoryPage'
+import AdminBrandPage from './pages/admin/AdminBrandPage'
 import { useContext } from 'react'
 import AuthContext from './context/AuthContext'
 import AdminRoute from './components/auth/AdminRoute'
@@ -89,6 +90,10 @@ function App() {
             <Route
               path='categories'
               element={<AdminCategoryPage />} />
+
+            <Route
+              path='brands'
+              element={<AdminBrandPage />} />
           </Route>
 
 
