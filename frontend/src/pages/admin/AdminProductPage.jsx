@@ -1,6 +1,7 @@
 import { Edit2, Plus, Trash2, X } from 'lucide-react'
 import React, { useEffect, useState } from 'react'
 import api from '../../utils/Axios.js'
+import Pagination from '../../components/ui/Pagination.jsx'
 const BACKEND_URL = 'http://localhost:3001'
 const AdminProductPage = () => {
     const [isModalOpen, setIsModalOpen] = useState(false)
@@ -8,6 +9,13 @@ const AdminProductPage = () => {
     const [loading, setLoading] = useState(true)
     const [selectedFiles, setSelectedFiles] = useState([]) // Lưu các file thật để gửi lên Server
     const [imagePreviews, setImagePreviews] = useState([]) // Lưu đường dẫn
+    const [categories, setCategories] = useState([])
+
+    const [isEditing, setIsEditing] = useState(false)
+    const [currentProductId, setCurrentProductId] = useState(null)
+
+    const [page, setPage] = useState(1)
+    const [pages, setPages] = useState(1)
     const [formData, setFormData] = useState({
         name: '',
         brand: '',
@@ -23,8 +31,11 @@ const AdminProductPage = () => {
 
     const fetchProducts = async () => {
         try {
-            const res = await api.get('/api/products')
-            setProducts(res.data)
+            const res = await api.get(`/api/products?pageNumber=${page}`)
+            setProducts(res.data.products)
+            setPages(res.data.pages)
+            setPage(res.data.page)
+
             setLoading(false)
         } catch (error) {
             console.error("Lỗi khi Get sản phẩm: ", error)
@@ -32,10 +43,20 @@ const AdminProductPage = () => {
         }
     }
 
+    const fetchCategories = async () => {
+        try {
+            const res = await api.get('/api/categories')
+            setCategories(res.data)
+        } catch (error) {
+            console.error("Lỗi khi lấy danh mục:", error)
+        }
+    }
+
 
     useEffect(() => {
         fetchProducts()
-    }, [])
+        fetchCategories()
+    }, [page])
 
     const hanldeSubmit = async (e) => {
         e.preventDefault()
@@ -61,23 +82,21 @@ const AdminProductPage = () => {
                 ...formData,
                 images: uploadedImages.length > 0 ? uploadedImages : formData.images
             }
-            await api.post('/api/products', productData);
+
+            if (isEditing) {
+                // Nếu đang sửa gọi PUT
+                await api.put(`/api/products/${currentProductId}`, productData)
+                alert("Cập nhật sản phẩm thành công!")
+            } else {
+
+                await api.post('/api/products', productData)
+                alert("Thêm sản phẩm thành công!")
+            }
 
 
-            setIsModalOpen(false)
+            closeModal()
             fetchProducts()
-            alert("Thêm sản phẩm thành công");
-            setFormData({
-                name: '',
-                brand: '',
-                price: '',
-                category: '',
-                description: '',
-                stock: 10,
-                images: ['']
-            })
-            setSelectedFiles([]); // Xóa file đã chọn
-            setImagePreviews([]);
+
         } catch (error) {
             console.error("Lỗi khi thêm sản phẩm:", error);
             alert("Có lỗi xảy ra, vui lòng kiểm tra lại!");
@@ -105,6 +124,40 @@ const AdminProductPage = () => {
             prev.filter((_, i) => i !== index));
     };
 
+    const handleEdit = (product) => {
+        setIsEditing(true)
+        setCurrentProductId(product._id)
+
+        // Đổ dữ liệu cũ vào Form
+        setFormData({
+            name: product.name,
+            brand: product.brand,
+            price: product.price,
+            category: product.category?._id || product.category, // Backend sẽ nhận ID danh mục
+            description: product.description,
+            stock: product.stock,
+            images: product.images // Giữ lại link ảnh cũ
+        })
+
+        // Hiển thị ảnh cũ lên phần Xem trước
+        setImagePreviews(product.images)
+        setIsModalOpen(true)
+    }
+
+
+    const closeModal = () => {
+        setIsModalOpen(false)
+        setIsEditing(false)
+        setCurrentProductId(null)
+
+        // Reset Form về trắng
+        setFormData({
+            name: '', brand: '', price: '', category: '', description: '', stock: 10, images: ['']
+        })
+        setImagePreviews([])
+        setSelectedFiles([])
+    }
+
     const hanldeDelete = async (id) => {
         try {
             if (window.confirm('Xác nhận xóa sản phẩm')) {
@@ -130,7 +183,11 @@ const AdminProductPage = () => {
 
                 </div>
                 <button
-                    onClick={() => setIsModalOpen(true)}
+                    onClick={() => {
+                        closeModal()
+                        setIsModalOpen(true)
+                    }
+                    }
                     className="bg-gray-500 text-white  px-6 py-3 text-[12px] uppercase font-bold tracking-widest flex items-center gap-2 hover:bg-gray-800 transition-all cursor-pointer">
 
                     <Plus size={16} /> Thêm sản phẩm mới
@@ -176,11 +233,11 @@ const AdminProductPage = () => {
                                 <td className="p-6 text-sm font-bold">
                                     {product.name}
                                 </td>
-                                <td className="p-6 text-xs text-gray-500 uppercase tracking-widest">{product.category}</td>
+                                <td className="p-6 text-xs text-gray-500 uppercase tracking-widest"> {product.category?.name || "Chưa phân loại"} </td>
                                 <td className="p-6 text-sm font-medium">{product.price.toLocaleString()}đ</td>
                                 <td className="p-6 text-right">
                                     <div className="flex justify-end gap-4">
-                                        <button className="text-gray-400 hover:text-black transition-colors"><Edit2 size={16} /></button>
+                                        <button onClick={() => { handleEdit(product) }} className="text-gray-400 hover:text-black transition-colors"><Edit2 size={16} /></button>
                                         <button onClick={() => hanldeDelete(product._id)} className="text-gray-400 hover:text-red-500 transition-colors"><Trash2 size={16} /></button>
                                     </div>
 
@@ -190,6 +247,9 @@ const AdminProductPage = () => {
                         ))}
                     </tbody>
                 </table>
+                <div className='pb-10'>
+                    <Pagination page={page} pages={pages} setPage={setPage} />
+                </div>
             </div>
 
             {/*MODAL*/}
@@ -198,13 +258,12 @@ const AdminProductPage = () => {
                     <div className="bg-white w-full max-w-xl shadow-2xl p-10 relative animate-in zoom-in-95 duration-300">
 
 
-                        <button onClick={() =>
-                            setIsModalOpen(false)}
+                        <button onClick={closeModal}
                             className="absolute top-6 right-6 text-gray-400 hover:text-black">
                             <X size={20} /></button>
 
                         <h2 className="font-serif text-2xl tracking-widest border-b pb-4 mb-8">
-                            Thêm sản phẩm mới</h2>
+                            {isEditing ? "Cập nhật sản phẩm" : "Thêm sản phẩm mới"}</h2>
 
 
 
@@ -308,16 +367,25 @@ const AdminProductPage = () => {
 
                                 <div className='col-span-2'>
                                     <label className="text-[10px] uppercase tracking-widest font-bold text-gray-400">
-                                        ID Danh mục (Category ID)
+                                        Danh mục sản phẩm
                                     </label>
-                                    <input
-                                        type="text"
+                                    <select
                                         required
-                                        placeholder="Dán ID từ MongoDB vào đây"
                                         value={formData.category}
                                         onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                                        className="w-full border-b border-gray-100 py-2 focus:outline-none focus:border-black transition-colors text-[12px] "
-                                    />
+                                        className="w-full border-b border-gray-100 py-2 focus:outline-none focus:border-black transition-colors text-[12px] bg-white "
+                                    >
+                                        <option value="" className='text-gray-300'>Chọn danh mục</option>
+                                        {categories.map((cat) => (
+                                            <option className="py-2 font-sans"
+                                                key={cat._id} value={cat._id}>
+                                                {cat.name}
+                                            </option>
+                                        ))}
+                                    </select>
+
+
+
                                 </div>
 
 
@@ -340,7 +408,7 @@ const AdminProductPage = () => {
 
 
                             <button type='submit' className="w-full bg-black text-white py-4 text-[10px] uppercase font-bold tracking-widest mt-8 hover:bg-gray-800 transition-all cursor-pointer">
-                                Lưu sản phẩm
+                                {isEditing ? "Cập nhật ngay" : "Lưu sản phẩm"}
                             </button>
                         </form>
                     </div>

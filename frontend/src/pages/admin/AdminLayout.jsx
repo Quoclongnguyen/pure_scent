@@ -1,6 +1,6 @@
 import React from 'react'
 import { Link, Outlet, useLocation } from 'react-router-dom'
-import { LayoutDashboard, Package, ShoppingCart, Layers, LogOut, Bell, User } from 'lucide-react'
+import { LayoutDashboard, Package, ShoppingCart, Layers, LogOut, Bell, User, Bandage, Award } from 'lucide-react'
 
 const AdminLayout = () => {
     const location = useLocation();
@@ -25,6 +25,11 @@ const AdminLayout = () => {
             path: '/admin/categories',
             icon: <Layers size={18} />,
             label: 'Danh mục'
+        },
+        {
+            path: '/admin/brands',
+            icon: <Award size={18} />,
+            label: 'Thương hiệu'
         },
     ];
 

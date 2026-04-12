@@ -11,6 +11,7 @@ export const getBrands = async (req, res) => {
 
 
 export const createBrand = async (req, res) => {
+    console.log("Dữ liệu nhận được:", req.body)
     const { name, description, origin } = req.body
 
     try {
