@@ -29,16 +29,32 @@ const ProductCard = ({ product }) => {
             {/* Thông tin sản phẩm */}
             <div className='space-y-1 px-1'>
                 <p className='text-[10px] uppercase tracking-[0.2em] text-gray-400 font-bold'>
-                    {product.brand}
+                    {product.brand?.name || product.brand}
                 </p>
                 <Link to={`/product/${product._id}`}>
                     <h3 className='font-serif text-lg text-black hover:text-gray-600 transition-colors'>
                         {product.name}
                     </h3>
                 </Link>
-                <p className='text-sm font-medium text-gray-900'>
-                    {product.price.toLocaleString('vi-VN')}
-                </p>
+
+                <div className='flex items-center gap-2'>
+                    {product.variants?.[0]?.discountPrice ? (
+                        <>
+                            <span className='text-sm font-bold text-black'>
+                                {product.variants[0].discountPrice.toLocaleString('vi-VN')}₫
+                            </span>
+                            <span className='text-[10px] text-gray-400 line-through'>
+                                {product.variants[0].originalPrice.toLocaleString('vi-VN')}₫
+                            </span>
+                        </>
+                    ) : (
+                        <p className='text-sm font-medium text-gray-900'>
+                            {product.variants && product.variants.length > 0
+                                ? `${product.variants[0].originalPrice.toLocaleString('vi-VN')}₫`
+                                : (product.price ? `${product.price.toLocaleString('vi-VN')}₫` : "Liên hệ")}
+                        </p>
+                    )}
+                </div>
                 <button className='bg-gray-500 text-white px-8 py-3 text-[10px] uppercase tracking-widest font-bold hover:bg-gray-800 transition-all mt-4 w-full flex items-center justify-center gap-2 cursor-pointer'>
                     <ShoppingCart size={14} />
                     Giỏ hàng

@@ -12,12 +12,16 @@ const ProductDetailPage = () => {
     const [quantity, setQuantity] = useState(1);
     const [activeIndex, setActiveIndex] = useState('')
     const [loading, setLoading] = useState(true)
+    const [selectedVariant, setSelectedVariant] = useState(null)
 
     const fetchProduct = async () => {
         try {
             const { data } = await api.get(`/api/products/${id}`)
             setProduct(data)
             setActiveIndex(0) // mặc định hiển thị ảnh đầu tiên
+            if (data.variants && data.variants.length > 0) {
+                setSelectedVariant(data.variants[0])
+            }
         } catch (error) {
             console.error('Lỗi khi lấy chi tiết sản phẩm ', error)
         } finally {
@@ -28,7 +32,7 @@ const ProductDetailPage = () => {
     const fetchProducts = async () => {
         try {
             const res = await api.get('/api/products')
-            setProducts(res.data)
+            setProducts(res.data.products)
             setLoading(false)
         } catch (error) {
             console.error("Lỗi khi Get sản phẩm: ", error)
@@ -96,14 +100,46 @@ const ProductDetailPage = () => {
                 <div className="flex flex-col space-y-10 py-4">
                     <div className="space-y-4">
                         <p className="text-[11px] uppercase tracking-[0.3em] text-gray-400 font-bold">
-                            {product.brand}
+                            {product.brand?.name || product.brand}
                         </p>
                         <h1 className="font-serif text-4xl md:text-5xl text-black leading-tight">
                             {product.name}
                         </h1>
-                        <p className="text-2xl font-light text-gray-900 border-b border-gray-100 pb-8">
-                            {product.price}
-                        </p>
+
+                        <div className='gap-4 border-b border-gray-100 p-8'>
+                            {selectedVariant?.discountPrice ? (
+                                <div className='space-y-2'>
+                                    <div className='flex items-center gap-3'>
+                                        <span className='text-3xl font-medium text-black '>
+                                            {selectedVariant.discountPrice.toLocaleString('vi-VN')}đ
+                                        </span>
+
+                                        <span className='text-lg font-light text-gray-400 line-through'>
+                                            {selectedVariant.originalPrice.toLocaleString('vi-VN')}đ
+                                        </span>
+
+                                        <span className='bg-[#e30019] text-white text-[11px] px-3 py- font-bold rounded-full'>
+                                            -{Math.round((1 - selectedVariant.discountPrice / selectedVariant.originalPrice) * 100)}%
+                                        </span>
+                                    </div>
+
+                                    <p>
+                                        (Tiết kiệm: {(selectedVariant.originalPrice - selectedVariant.discountPrice).toLocaleString('vi-VN')}đ)
+                                    </p>
+
+                                </div>
+                            ) : (
+                                <span className='text-2xl font-light text-gray-900'>
+                                    {selectedVariant
+                                        ? `${selectedVariant.originalPrice.toLocaleString('vi-VN')}đ`
+                                        : (product.price ? `${product.price.toLocaleString('vi-VN')}đ` : 'Đang cập nhật')
+                                    }
+                                </span>
+                            )
+                            }
+
+                        </div>
+
                     </div>
 
                     {/* Description */}
@@ -137,16 +173,17 @@ const ProductDetailPage = () => {
                             Chọn dung tích
                         </label>
                         <div className="flex gap-4">
-                            {product.sizes?.map((size) => (
+                            {product.variants?.map((variant, index) => (
                                 <button
-                                    key={size}
-                                    onClick={() => setSelectedSize(size)}
-                                    className={`px-8 py-3 text-xs tracking-widest transition-all cursor-pointer ${selectedSize === size
-                                        ? 'bg-black text-white'
-                                        : 'border border-gray-200 text-gray-400 hover:border-black hover:text-black'
+                                    key={index}
+                                    onClick={() => setSelectedVariant(variant)}
+                                    className={`px-8 py-3 text-xs tracking-widest transition-all cursor-pointer 
+                                        ${selectedVariant?.size === variant.size
+                                            ? 'bg-black text-white'
+                                            : 'border border-gray-200 text-gray-400 hover:border-black hover:text-black'
                                         }`}
                                 >
-                                    {size}
+                                    {variant.size}
                                 </button>
                             ))}
                         </div>
@@ -178,26 +215,59 @@ const ProductDetailPage = () => {
                     </div>
 
                     {/* Collapsible details (Extra Info) */}
+
                     <div className="pt-8 space-y-4">
-                        <details className="group border-b border-gray-100 pb-4 cursor-pointer">
-                            <summary className="flex items-center justify-between font-bold text-[10px] uppercase tracking-widest list-none">
-                                Chi tiết sản phẩm
-                                <span className="group-open:rotate-180 transition-transform font-light">+</span>
-                            </summary>
-                            <p className="pt-4 text-sm text-gray-500 leading-relaxed">
-                                Được chắt lọc từ những nguyên liệu quý hiếm, Santal 33 mang đến một hành trình khứu giác độc bản.
-                                Sản phẩm được đóng gói thủ công trong bao bì tái chế sang trọng.
-                            </p>
-                        </details>
-                        <details className="group border-b border-gray-100 pb-4 cursor-pointer">
-                            <summary className="flex items-center justify-between font-bold text-[10px] uppercase tracking-widest list-none">
-                                Vận chuyển & Đổi trả
-                                <span className="group-open:rotate-180 transition-transform font-light">+</span>
-                            </summary>
-                            <p className="pt-4 text-sm text-gray-500 leading-relaxed">
-                                Miễn phí vận chuyển cho đơn hàng từ 2.000.000đ. Chính sách đổi trả trong vòng 7 ngày nếu sản phẩm còn lớp niêm phong.
-                            </p>
-                        </details>
+                        {product.scentNotes && (
+                            <details className='group border-b border-gray-100 pb-4 cursor-pointer' open>
+                                <summary className='flex items-center justify-between font-bold text-[10px] uppercase tracking-widest list-none'>
+                                    Tầng hương đặc trưng
+                                    <span className="group-open:rotate-180 transition-transform font-light">+</span>
+                                </summary>
+                                <div className='pt-6 grid grid-cols-1 gap-4      items-center'>
+                                    <div className='flex gap-4'>
+                                        <span className="text-[10px] font-bold uppercase w-32 text-gray-400">Hương đầu:</span>
+                                        <span className='text-sm'>
+                                            {product.scentNotes.top || 'Đang cập nhật'}
+                                        </span>
+                                    </div>
+                                    <div className='flex gap-4'>
+                                        <span className="text-[10px] font-bold uppercase w-32 text-gray-400">Hương giữa:</span>
+                                        <span className='text-sm'>
+                                            {product.scentNotes.heart || 'Đang cập nhật'}
+                                        </span>
+                                    </div>
+                                    <div className='flex gap-4'>
+                                        <span className="text-[10px] font-bold uppercase w-32 text-gray-400">Hương cuối:</span>
+                                        <span className='text-sm '>
+                                            {product.scentNotes.base || 'Đang cập nhật'}
+                                        </span>
+                                    </div>
+                                </div>
+                            </details>
+                        )}
+                        {product.specs && (
+                            <details className='group border-b border-gray-100 pb-4 cursor-pointer'>
+                                <summary className='flex items-center justify-between font-bold text-[10px] uppercase tracking-widest list-none'>
+                                    Thông số sản phẩm
+                                    <span className='group-open:rotate-180 transition-transform font-light'>+</span>
+                                </summary>
+                                <div className="pt-6 grid grid-cols-1 gap-4 ">
+                                    <div className='flex gap-4'>
+                                        <span className="text-[10px] font-bold uppercase w-32 text-gray-400">Độ lưu hương:</span>
+                                        <span className='text-sm'> {product.specs.longevity}</span>
+                                    </div>
+
+                                    <div className="flex gap-4  ">
+                                        <span className="text-[10px] font-bold uppercase w-32 text-gray-400">Độ tỏa hương: </span>
+                                        <span className='text-sm'> {product.specs.sillage}</span>
+                                    </div>
+
+                                </div>
+                            </details>
+                        )}
+
+
+
                     </div>
                 </div>
             </div>
