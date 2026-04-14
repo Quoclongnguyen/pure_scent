@@ -46,6 +46,14 @@ const productSchema = mongoose.Schema(
         required: true,
       },
     ],
+
+    // Các trường cho mô tả chi tiết
+    origin: { type: String },
+    scentGroup: { type: String },
+    targetGender: { type: String },
+    usageInstructions: { type: String },
+    designDescription: { type: String },
+    descriptionImages: [String],
   },
   {
     timestamps: true,

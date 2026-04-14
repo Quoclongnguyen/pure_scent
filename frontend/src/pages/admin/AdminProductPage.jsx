@@ -7,8 +7,13 @@ const AdminProductPage = () => {
     const [isModalOpen, setIsModalOpen] = useState(false)
     const [products, setProducts] = useState([])
     const [loading, setLoading] = useState(true)
+
     const [selectedFiles, setSelectedFiles] = useState([]) // Lưu các file thật để gửi lên Server
-    const [imagePreviews, setImagePreviews] = useState([]) // Lưu đường dẫn
+    const [imagePreviews, setImagePreviews] = useState([])
+    const [selectedDescFiles, setSelectedDescFiles] = useState([])
+    const [descImagePreviews, setDescImagePreviews] = useState([])
+
+
     const [categories, setCategories] = useState([])
 
     const [isEditing, setIsEditing] = useState(false)
@@ -26,9 +31,16 @@ const AdminProductPage = () => {
         description: '',
         images: [''],
 
-        variants: [{ size: '', originalPrice: '', discountPrice: '', stock: 0 }],
+        variants: [{ size: '', originalPrice: '', discountPercent: '', discountPrice: '', stock: 0 }],
         scentNotes: { top: '', heart: '', base: '' },
-        specs: { longevity: '', sillage: '', concentration: '' }
+        specs: { longevity: '', sillage: '', concentration: '' },
+        origin: '',
+        scentGroup: '',
+        targetGender: '',
+        usageInstructions: '',
+        designDescription: '',
+        descriptionImages: []
+
     })
 
 
@@ -93,9 +105,27 @@ const AdminProductPage = () => {
                 uploadedImages = response.data
             }
 
+            //  Upload ảnh cho mô tả chi tiết
+            let uploadedDescImages = []
+            if (selectedDescFiles.length > 0) {
+                const formDataDesc = new FormData()
+                selectedDescFiles.forEach(file => {
+                    formDataDesc.append('images', file)
+                })
+                const resDesc = await api.post('/api/upload', formDataDesc, {
+                    headers: { 'Content-Type': 'multipart/form-data' }
+                })
+                uploadedDescImages = resDesc.data
+            }
+
+
             const productData = {
                 ...formData,
-                images: uploadedImages.length > 0 ? uploadedImages : formData.images
+                // Nếu có upload ảnh mới thì dùng ảnh mới, không thì giữ ảnh cũ
+                images: uploadedImages.length > 0 ? uploadedImages : formData.images,
+                descriptionImages: uploadedDescImages.length > 0
+                    ? uploadedDescImages
+                    : formData.descriptionImages
             }
 
             if (isEditing) {
@@ -133,10 +163,23 @@ const AdminProductPage = () => {
 
     // xóa ảnh đã chọn
     const removeImage = (index) => {
-        setImagePreviews(prev =>
-            prev.filter((_, i) => i !== index));
-        setSelectedFiles(prev =>
-            prev.filter((_, i) => i !== index));
+        setImagePreviews(prev => prev.filter((_, i) => i !== index));
+        setSelectedFiles(prev => prev.filter((_, i) => i !== index));
+    };
+
+    // Xử lý ảnh mô tả
+    const handleDescFileChange = (e) => {
+
+        const files = Array.from(e.target.files)
+        const newPreviews = files.map(file => URL.createObjectURL(file))
+        // Tạo link xem trước cho các ảnh mới
+        setDescImagePreviews(prev => [...prev, ...newPreviews].slice(0, 5))
+        setSelectedDescFiles(prev => [...prev, ...files].slice(0, 5))
+    };
+
+    const removeDescImage = (index) => {
+        setDescImagePreviews(prev => prev.filter((_, i) => i !== index));
+        setSelectedDescFiles(prev => prev.filter((_, i) => i !== index));
     };
 
     const handleEdit = (product) => {
@@ -161,11 +204,18 @@ const AdminProductPage = () => {
             images: product.images, // Giữ lại link ảnh cũ
             variants: updatedVariants,
             scentNotes: product.scentNotes || { top: '', heart: '', base: '' },
-            specs: product.specs || { longevity: '', sillage: '', concentration: '' }
+            specs: product.specs || { longevity: '', sillage: '', concentration: '' },
+            origin: product.origin || '',
+            scentGroup: product.scentGroup || '',
+            targetGender: product.targetGender || '',
+            usageInstructions: product.usageInstructions || '',
+            designDescription: product.designDescription || '',
+            descriptionImages: product.descriptionImages || []
         })
 
         // Hiển thị ảnh cũ lên phần Xem trước
         setImagePreviews(product.images)
+        setDescImagePreviews(product.descriptionImages || [])
         setIsModalOpen(true)
         setActiveTab('basic') // Reset về tab đầu tiên khi mở modal
     }
@@ -194,7 +244,7 @@ const AdminProductPage = () => {
         const updatedVariants = [...formData.variants]
 
         if (field === 'discountPercent') {
-            updatedVariants[index].discountPercent = value //Lưu lại % để hiện ở ô nhập
+            updatedVariants[index].discountPercent = value
 
             // Tính toán giá thực tế để gửi về Backend
             const originalPrice = Number(updatedVariants[index].originalPrice) || 0
@@ -239,10 +289,18 @@ const AdminProductPage = () => {
             images: [''],
             variants: [{ size: '', originalPrice: '', discountPrice: '', stock: 0 }],
             scentNotes: { top: '', heart: '', base: '' },
-            specs: { longevity: '', sillage: '', concentration: '' }
+            specs: { longevity: '', sillage: '', concentration: '' },
+            origin: '',
+            scentGroup: '',
+            targetGender: '',
+            usageInstructions: '',
+            designDescription: '',
+            descriptionImages: []
         })
         setImagePreviews([])
         setSelectedFiles([])
+        setDescImagePreviews([])
+        setSelectedDescFiles([])
         setActiveTab('basic')
     }
 
@@ -346,7 +404,7 @@ const AdminProductPage = () => {
 
             {/*MODAL*/}
             {isModalOpen && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 backdrop-blur-sm p-4 animate-in fade-in duration-300">
+                <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 backdrop-blur-sm p-4 animate-in fade-in duration-300 ">
                     <div className="bg-white w-full max-w-xl shadow-2xl p-10 relative animate-in zoom-in-95 duration-300">
 
 
@@ -380,7 +438,7 @@ const AdminProductPage = () => {
 
                             {/* --- TAB 1: THÔNG TIN CƠ BẢN --- */}
                             {activeTab === 'basic' && (
-                                <div className='space-y-6 animate-in fade-in duration-500'>
+                                <div className='space-y-6 animate-in fade-in duration-500 max-h-[60vh] overflow-y-auto [scrollbar-width:none]'>
                                     <div className='grid grid-cols-2 gap-5'>
                                         <div className='col-span-2'>
                                             <label className="text-[10px] uppercase tracking-widest font-bold text-gray-400">
@@ -573,37 +631,136 @@ const AdminProductPage = () => {
 
                             {/* --- TAB 3: HƯƠNG & THÔNG SỐ --- */}
                             {activeTab === 'details' && (
-                                <div className="grid grid-cols-2 gap-8 animate-in fade-in duration-500">
-                                    <div className="space-y-6">
-                                        <h4 className="text-[10px] uppercase font-bold tracking-widest border-b border-gray-50 pb-2">Tầng hương</h4>
-                                        {['top', 'heart', 'base'].map((n) => (
-                                            <div key={n}>
-                                                <label className="text-[8px] uppercase text-gray-400 block mb-1">
-                                                    {n === 'top' ? 'Hương đầu' : n === 'heart' ? 'Hương giữa' : 'Hương cuối'}
-                                                </label>
+                                <div className="space-y-8 animate-in fade-in duration-500 max-h-[60vh] overflow-y-auto pr-2 [scrollbar-width:none]">
+                                    <div className="grid grid-cols-2 gap-8">
+
+                                        <div className="space-y-6">
+                                            <h4 className="text-[10px] uppercase font-bold tracking-widest border-b border-gray-50 pb-2">Tầng hương</h4>
+                                            {['top', 'heart', 'base'].map((n) => (
+                                                <div key={n}>
+                                                    <label className="text-[8px] uppercase text-gray-400 block mb-1">
+                                                        {n === 'top' ? 'Hương đầu' : n === 'heart' ? 'Hương giữa' : 'Hương cuối'}
+                                                    </label>
+                                                    <input
+                                                        type="text"
+                                                        value={formData.scentNotes[n]}
+                                                        onChange={(e) => handleNestedChange('scentNotes', n, e.target.value)}
+                                                        className="w-full border-b border-gray-100 py-1 focus:outline-none focus:border-black text-xs"
+                                                        placeholder="VD: Cam Bergamot, Gỗ tuyết tùng..."
+                                                    />
+                                                </div>
+                                            ))}
+
+                                            <h4 className="text-[10px] uppercase font-bold tracking-widest border-b border-gray-50 pb-2 mt-8">Thông số kỹ thuật</h4>
+                                            {['longevity', 'sillage', 'concentration'].map((s) => (
+                                                <div key={s}>
+                                                    <label className="text-[8px] uppercase text-gray-400 block mb-1">
+                                                        {s === 'longevity' ? 'Độ lưu hương' : s === 'sillage' ? 'Độ tỏa hương' : 'Nồng độ'}
+                                                    </label>
+                                                    <input
+                                                        type="text"
+                                                        value={formData.specs[s]}
+                                                        onChange={(e) => handleNestedChange('specs', s, e.target.value)}
+                                                        className="w-full border-b border-gray-100 py-1 focus:outline-none focus:border-black text-xs"
+                                                        placeholder="VD: 8-12 tiếng, Extrait de Parfum..."
+                                                    />
+                                                </div>
+                                            ))}
+                                        </div>
+
+                                        {/* Cột 2: Thông tin chi tiết mới */}
+                                        <div className="space-y-6">
+                                            <h4 className="text-[10px] uppercase font-bold tracking-widest border-b border-gray-50 pb-2">Thông tin bổ sung</h4>
+                                            <div>
+                                                <label className="text-[8px] uppercase text-gray-400 block mb-1">Xuất xứ</label>
                                                 <input
                                                     type="text"
-                                                    value={formData.scentNotes[n]} onChange={(e) =>
-                                                        handleNestedChange('scentNotes', n, e.target.value)}
+                                                    value={formData.origin}
+                                                    onChange={(e) => setFormData({ ...formData, origin: e.target.value })}
                                                     className="w-full border-b border-gray-100 py-1 focus:outline-none focus:border-black text-xs"
-                                                    placeholder="VD: Cam Bergamot, Gỗ tuyết tùng..." />
+                                                    placeholder="VD: Pháp, Ý, Dubai..."
+                                                />
                                             </div>
-                                        ))}
-                                    </div>
-                                    <div className="space-y-6">
-                                        <h4 className="text-[10px] uppercase font-bold tracking-widest border-b border-gray-50 pb-2">Thông số khác</h4>
-                                        {['longevity', 'sillage', 'concentration'].map((s) => (
-                                            <div key={s}>
-                                                <label className="text-[8px] uppercase text-gray-400 block mb-1">
-                                                    {s === 'longevity' ? 'Độ lưu hương' : s === 'sillage' ? 'Độ tỏa hương' : 'Nồng độ'}
-                                                </label>
+                                            <div>
+                                                <label className="text-[8px] uppercase text-gray-400 block mb-1">Nhóm hương</label>
                                                 <input
                                                     type="text"
-                                                    value={formData.specs[s]}
-                                                    onChange={(e) => handleNestedChange('specs', s, e.target.value)}
-                                                    className="w-full border-b border-gray-100 py-1 focus:outline-none focus:border-black text-xs" placeholder="VD: 8-12 tiếng, Extrait de Parfum..." />
+                                                    value={formData.scentGroup}
+                                                    onChange={(e) => setFormData({ ...formData, scentGroup: e.target.value })}
+                                                    className="w-full border-b border-gray-100 py-1 focus:outline-none focus:border-black text-xs"
+                                                    placeholder="VD: Woody, Floral, Oriental..."
+                                                />
                                             </div>
-                                        ))}
+                                            <div>
+                                                <label className="text-[8px] uppercase text-gray-400 block mb-1">Đối tượng (Gender)</label>
+                                                <input
+                                                    type="text"
+                                                    value={formData.targetGender}
+                                                    onChange={(e) => setFormData({ ...formData, targetGender: e.target.value })}
+                                                    className="w-full border-b border-gray-100 py-1 focus:outline-none focus:border-black text-xs"
+                                                    placeholder="VD: Nam, Nữ, Unisex..."
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Phần mô tả dài ở dưới */}
+                                    <div className="space-y-6 pt-4">
+                                        <h4 className="text-[10px] uppercase font-bold tracking-widest border-b border-gray-50 pb-2">Mô tả thiết kế & Cách dùng</h4>
+                                        <div>
+                                            <label className="text-[8px] uppercase text-gray-400 block mb-1">Mô tả thiết kế</label>
+                                            <textarea
+                                                value={formData.designDescription}
+                                                onChange={(e) => setFormData({ ...formData, designDescription: e.target.value })}
+                                                className="w-full border border-gray-100 p-2 focus:outline-none focus:border-black text-xs min-h-[80px]"
+                                                placeholder="Mô tả về kiểu dáng chai, hộp đựng..."
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="text-[8px] uppercase text-gray-400 block mb-1">Hướng dẫn sử dụng & Bảo quản</label>
+                                            <textarea
+                                                value={formData.usageInstructions}
+                                                onChange={(e) => setFormData({ ...formData, usageInstructions: e.target.value })}
+                                                className="w-full border border-gray-100 p-2 focus:outline-none focus:border-black text-xs min-h-[80px]"
+                                                placeholder="Cách xịt, vị trí xịt, cách bảo quản..."
+                                            />
+                                        </div>
+
+                                        {/* Thêm phần tải ảnh cho mô tả */}
+                                        <div className="pt-4">
+                                            <label className="text-[10px] uppercase tracking-widest font-bold text-gray-400 mb-4 block">
+                                                Ảnh minh họa bài viết
+                                            </label>
+                                            <p className="text-[10px] text-gray-400 mb-4 italic">* Thứ tự: 1-Ảnh Mùi hương | 2-Ảnh Thiết kế | 3-Ảnh Hướng dẫn</p>
+
+                                            <div className="flex flex-wrap gap-4">
+                                                {descImagePreviews.map((url, index) => (
+                                                    <div key={index} className="relative w-24 h-24 group border border-gray-100">
+                                                        <img src={url} className="w-full h-full object-cover" />
+                                                        <button
+                                                            className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer shadow-lg"
+                                                            type="button"
+                                                            onClick={() => removeDescImage(index)}
+                                                        >
+                                                            <X size={12} />
+                                                        </button>
+                                                    </div>
+                                                ))}
+                                                {descImagePreviews.length < 5 && (
+                                                    <label className="w-24 h-24 border-2 border-dashed border-gray-100 flex flex-col items-center justify-center text-gray-300 hover:border-black hover:text-black transition-all cursor-pointer">
+                                                        <Plus size={24} strokeWidth={1} />
+                                                        <span className="text-[8px] uppercase mt-2 font-bold tracking-tighter text-center">Tải ảnh mô tả</span>
+                                                        <input
+                                                            type="file"
+                                                            multiple
+                                                            accept="image/*"
+                                                            className="hidden"
+                                                            onChange={handleDescFileChange}
+                                                        />
+                                                    </label>
+                                                )}
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             )}

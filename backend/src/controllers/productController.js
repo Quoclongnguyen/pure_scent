@@ -47,9 +47,12 @@ const getProductById = async (req, res) => {
 
 const createProduct = async (req, res) => {
     try {
-        const { name, brand, category, description, images, variants, scentNotes, specs } = req.body
+        const {
+            name, brand, category, description, images, variants, scentNotes, specs,
+            origin, scentGroup, targetGender, usageInstructions, designDescription, descriptionImages } = req.body
         const product = await Product.create({
-            name, brand, category, description, images, variants, scentNotes, specs
+            name, brand, category, description, images, variants, scentNotes, specs,
+            origin, scentGroup, targetGender, usageInstructions, designDescription, descriptionImages
 
         })
         res.status(201).json(product)
@@ -61,7 +64,9 @@ const createProduct = async (req, res) => {
 
 const updateProduct = async (req, res) => {
     try {
-        const { name, brand, category, description, images, variants, scentNotes, specs } = req.body;
+        const { name, brand, category, description, images, variants, scentNotes, specs,
+            origin, scentGroup, targetGender, usageInstructions, designDescription, descriptionImages
+        } = req.body;
 
         const product = await Product.findById(req.params.id);
 
@@ -77,7 +82,13 @@ const updateProduct = async (req, res) => {
         product.variants = variants !== undefined ? variants : product.variants; // Xử lý riêng cho số 0
         product.scentNotes = scentNotes || product.scentNotes
         product.specs = specs || product.specs
-        product.images = images || product.images;
+        product.images = images || product.images
+        product.origin = origin || product.origin
+        product.scentGroup = scentGroup || product.scentGroup
+        product.targetGender = targetGender || product.targetGender
+        product.usageInstructions = usageInstructions || product.usageInstructions
+        product.designDescription = designDescription
+        product.descriptionImages = descriptionImages
 
         const updatedProduct = await product.save();
         res.status(201).json(updatedProduct);

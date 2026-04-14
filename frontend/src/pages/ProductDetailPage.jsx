@@ -14,6 +14,8 @@ const ProductDetailPage = () => {
     const [loading, setLoading] = useState(true)
     const [selectedVariant, setSelectedVariant] = useState(null)
 
+    const [activeTab, setActiveTab] = useState('description')// Quản lý Tab nào đang mở
+    const [isExpanded, setIsExpanded] = useState(false) // Ấn Xem thêm
     const fetchProduct = async () => {
         try {
             const { data } = await api.get(`/api/products/${id}`)
@@ -148,25 +150,6 @@ const ProductDetailPage = () => {
                     </p>
 
 
-
-
-                    {/* <div className="grid grid-cols-3 gap-6 py-8 border-y border-gray-50">
-                        <div className="space-y-2">
-                            <h4 className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Top</h4>
-                            <p className="text-sm font-medium">{product.notes.top}</p>
-                        </div>
-                        <div className="space-y-2">
-                            <h4 className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Heart</h4>
-                            <p className="text-sm font-medium">{product.notes.heart}</p>
-                        </div>
-                        <div className="space-y-2">
-                            <h4 className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Base</h4>
-                            <p className="text-sm font-medium">{product.notes.base}</p>
-                        </div>
-                    </div> */}
-
-
-
                     {/* Size Selection */}
                     <div className="space-y-5">
                         <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-black">
@@ -269,8 +252,124 @@ const ProductDetailPage = () => {
 
 
                     </div>
+
                 </div>
+
             </div>
+
+            <section className='max-w-4xl mx-auto px-6 pt-20 border-t border-gray-100'>
+                <div className='flex justify-center gap-12 border-b border-gray-100 mb-12'>
+                    {['description', 'shipping', 'returns'].map((tab) => (
+                        <button
+                            key={tab}
+                            onClick={() => setActiveTab(tab)}
+                            className={`pb-4 text-[11px] uppercase font-bold tracking-[0.2em] transition-all relative
+                    ${activeTab === tab ? 'text-black' : 'text-gray-300 hover:text-gray-400'}`}
+                        >
+                            {tab === 'description' ? 'Mô tả sản phẩm' : tab === 'shipping' ? 'Chính sách giao hàng' : 'Chính sách đổi trả'}
+                            {activeTab === tab && <div className="absolute bottom-0 left-0 w-full h-[2px] bg-black animate-in slide-in-from-left" />}
+                        </button>
+                    ))}
+                </div>
+
+                {activeTab === 'description' && (
+                    <div className='relative'>
+                        <div className={`space-y-12 transition-all duration-700 overflow-hidden 
+                            ${isExpanded ? 'max-h-[5000px]' : 'max-h-[600px]'}`}>
+
+                            {/* A. Thông tin tóm tắt (Bullets) */}
+                            <div className="space-y-4">
+                                <h2 className="font-serif text-3xl text-black">
+                                    {product.name} {selectedVariant?.size}
+                                </h2>
+                                <ul className="grid grid-cols-1 md:grid-cols-2 gap-y-3 text-[13px] text-gray-600 list-disc pl-5">
+                                    {product.origin &&
+                                        <li>Xuất xứ: {product.origin}
+                                        </li>}
+                                    {product.targetGender &&
+                                        <li>Đối tượng: {product.targetGender}
+                                        </li>}
+                                    {product.scentGroup &&
+                                        <li>Nhóm hương: {product.scentGroup}
+                                        </li>}
+                                    {product.specs?.longevity &&
+                                        <li>Độ lưu hương: {product.specs.longevity}
+                                        </li>}
+                                    {product.specs?.sillage &&
+                                        <li>Độ tỏa hương: {product.specs.sillage}
+                                        </li>}
+                                    {product.specs?.concentration &&
+                                        <li>Nồng độ: {product.specs.concentration}
+                                        </li>}
+                                </ul>
+                            </div>
+                            <div className="space-y-6">
+                                <h3 className="font-serif text-2xl border-l-2 border-black pl-4">Mùi hương</h3>
+                                <p className="text-gray-600 leading-relaxed italic">{product.description}</p>
+
+                                {/* Hiển thị ảnh mô tả đầu tiên (thường là ảnh nốt hương) */}
+                                {product.descriptionImages?.[0] && (
+                                    <div className="w-[600px] mx-auto bg-gray-50 p-4 rounded-sm">
+                                        <img
+                                            src={getImageUrl(product.descriptionImages[0])}
+                                            className="w-full h-auto object-contain" alt="Scent Infographic" />
+                                    </div>
+                                )}
+                            </div>
+                            <div className="space-y-6">
+                                <h3 className="font-serif text-2xl border-l-2 border-black pl-4">Thiết kế</h3>
+                                <p className="text-gray-600 leading-relaxed">
+                                    {product.designDescription || "Đang cập nhật nội dung..."}</p>
+                                {product.descriptionImages?.[1] && (
+                                    <div className="w-[600px] mx-auto bg-gray-50 p-4 border border-gray-100">
+                                        <img src={getImageUrl(product.descriptionImages[1])} className="w-full h-auto" alt="Design" />
+                                    </div>
+                                )}
+                            </div>
+
+                            <div className="space-y-6">
+                                <h3 className="font-serif text-2xl border-l-2 border-black pl-4">Hướng dẫn sử dụng</h3>
+                                <p className="text-gray-600 leading-relaxed whitespace-pre-line">
+                                    {product.usageInstructions || "Đang cập nhật nội dung..."}</p>
+                                {product.descriptionImages?.[2] && (
+                                    <div className="w-[600px] mx-auto bg-gray-50 p-4 border border-gray-100">
+                                        <img src={getImageUrl(product.descriptionImages[2])} className="w-full h-auto" alt="Design" />
+                                    </div>
+                                )}
+                            </div>
+
+
+
+                            {!isExpanded && (
+                                <div className="absolute bottom-0 left-0 w-full h-18 bg-gradient-to-t from-white via-white/80 to-transparent flex items-bottom justify-center pb-4">
+                                    <button
+                                        onClick={() => setIsExpanded(true)}
+                                        className="bg-white border border-black px-5 py-3 text-[10px] uppercase font-bold tracking-widest hover:bg-black hover:text-white transition-all shadow-xl"
+                                    >
+                                        Xem thêm nội dung
+                                    </button>
+                                </div>
+                            )}
+
+
+
+                        </div>
+                    </div>
+                )}
+                {activeTab !== 'description' && (
+                    <div className="text-sm text-gray-500 leading-loose animate-in fade-in">
+                        {activeTab === 'shipping' ? (
+                            <p>PureScent giao hàng toàn quốc. Thời gian từ 2-4 ngày tùy khu vực...</p>
+                        ) : (
+                            <p>Hỗ trợ đổi trả trong vòng 7 ngày nếu sản phẩm còn nguyên seal...</p>
+                        )}
+                    </div>
+                )}
+
+
+            </section>
+
+
 
             {/* Related Products Section */}
             <section className="max-w-7xl mx-auto px-6 pt-32">
