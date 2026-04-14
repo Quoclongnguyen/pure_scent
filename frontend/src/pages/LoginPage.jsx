@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { Eye, EyeOff, Mail, Lock, ArrowRight } from 'lucide-react'
 import AuthContext from '../context/AuthContext';
 import api from '../utils/Axios.js'
+import { toast } from 'sonner';
 
 const LoginPage = () => {
     const [showPassword, setShowPassword] = useState(false);
@@ -31,11 +32,11 @@ const LoginPage = () => {
 
 
             login(res.data);
-            alert("Đăng nhập thành công!");
+            toast.success("Đăng nhập thành công!");
             navigate('/');
 
         } catch (error) {
-
+            console.log("lỗi khi đăng nhập".error)
             setError(error.response?.data?.message || "Đã có lỗi xảy ra!");
         }
     };

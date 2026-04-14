@@ -1,5 +1,7 @@
 
 import { Link, Navigate, Outlet, Route, Routes } from 'react-router-dom'
+import { Toaster } from '@/components/ui/sonner'
+
 import HomePage from './pages/HomePage'
 import LoginPage from './pages/LoginPage'
 import Navbar from './components/navbar/Navbar'
@@ -25,6 +27,10 @@ function App() {
 
   return (
     <>
+      <Toaster
+
+        position="top-right"
+      />
       <Routes>
         <Route element={
           <>

@@ -46,9 +46,11 @@ const ProductDetailPage = () => {
         fetchProducts()
     }, [])
 
-    if (!product) {
-        return <div className="min-h-screen flex items-center justify-center uppercase tracking-widest text-xs">Đang tải...</div>;
-    }
+    if (loading) return (
+        <div className="p-10">
+            <TableSkeleton rows={8} />
+        </div>
+    )
 
     return (
         <main className="min-h-screen bg-white pb-24">

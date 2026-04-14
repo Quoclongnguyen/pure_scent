@@ -2,6 +2,10 @@ import { Edit2, Plus, Trash2, X } from 'lucide-react'
 import React, { useEffect, useState } from 'react'
 import api from '../../utils/Axios.js'
 import Pagination from '../../components/ui/Pagination.jsx'
+import { toast } from 'sonner'
+
+import TableSkeleton from '../../components/ui/TableSkeleton.jsx'
+
 const BACKEND_URL = 'http://localhost:3001'
 const AdminProductPage = () => {
     const [isModalOpen, setIsModalOpen] = useState(false)
@@ -131,11 +135,12 @@ const AdminProductPage = () => {
             if (isEditing) {
                 // Nếu đang sửa gọi PUT
                 await api.put(`/api/products/${currentProductId}`, productData)
-                alert("Cập nhật sản phẩm thành công!")
+                toast.success('Cập nhật sản phẩm thành công!')
+
             } else {
 
                 await api.post('/api/products', productData)
-                alert("Thêm sản phẩm thành công!")
+                toast.success('Thêm sản phẩm thành công!')
             }
 
 
@@ -143,8 +148,8 @@ const AdminProductPage = () => {
             fetchProducts()
 
         } catch (error) {
-            console.error("Lỗi khi thêm sản phẩm:", error);
-            alert("Có lỗi xảy ra, vui lòng kiểm tra lại!");
+            console.error("Lỗi khi thêm sản phẩm:", error)
+            toast.error('Có lỗi xảy ra, vui lòng kiểm tra lại!')
         } finally {
             setLoading(false);
         }
@@ -310,13 +315,21 @@ const AdminProductPage = () => {
                 await api.delete(`/api/products/${id} `)
             }
             fetchProducts()
-            alert('Bạn đã xóa thành công')
+            toast.success('Bạn đã xóa thành công!')
+            alert('')
         } catch (error) {
             console.error("Lỗi khi xóa sản phẩm: ", error)
+            toast.error('Có lỗi Khi xóa sản phẩm, vui lòng kiểm tra lại!')
+
         }
     }
 
-    if (loading) return <p>Loading...</p>
+
+    if (loading) return (
+        <div className="p-10">
+            <TableSkeleton rows={8} />
+        </div>
+    )
     return (
         <div className="space-y-8 animate-in fade-in duration-500">
             {/*HEADER*/}
