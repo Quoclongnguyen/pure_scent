@@ -3,9 +3,10 @@ import { Link } from 'react-router-dom';
 import { ShoppingCart, User, Search } from 'lucide-react';
 import AuthContext from '../../context/AuthContext';
 import api from '../../utils/Axios.js'
+import CartContext from '../../context/CartContext';
 const Navbar = () => {
     const { userInfo, logout } = useContext(AuthContext)
-
+    const { cartCount } = useContext(CartContext)
     const handleLogout = async () => {
         try {
             await api.post('api/users/logout')
@@ -87,7 +88,12 @@ const Navbar = () => {
 
                     <Link to="/cart" className="relative">
                         <ShoppingCart size={20} strokeWidth={1.5} />
-                        <span className="absolute -top-2 -right-2 bg-black text-white text-[10px] w-4 h-4 rounded-full flex justify-center items-center">2</span>
+                        {cartCount > 0 && (
+                            <span className="absolute -top-2 -right-2 bg-black text-white text-[10px] w-4 h-4 rounded-full flex justify-center items-center">
+                                {cartCount}
+                            </span>
+                        )}
+
                     </Link>
                 </div>
             </div>

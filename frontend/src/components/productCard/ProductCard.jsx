@@ -1,9 +1,28 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import { Link } from 'react-router-dom'
 import { ShoppingCart, Eye } from 'lucide-react'
+import CartContext from '../../context/CartContext'
+import { toast } from 'sonner'
 
 // Nhận product từ props
 const ProductCard = ({ product }) => {
+    const { addToCart } = useContext(CartContext)
+    const handleAddToCard = async () => {
+        try {
+            const defaultVariant = product.variants?.[0]
+            const quantity = 1 // vì ở trang chủ không chọn được dung tích 
+            if (defaultVariant) {
+                addToCart(product, defaultVariant, quantity)
+                toast.success(`Đã thêm ${product.name} (${defaultVariant.size}) vào giõ hàng!`)
+            }
+            else {
+                toast.error("Vui lòng chọn dung tích!")
+            }
+        } catch (error) {
+            console.log('Lỗi khi thêm vào giõ hàng'.error)
+        }
+
+    }
     return (
         <div className='group cursor-pointer space-y-4 text-left'>
 
@@ -55,9 +74,9 @@ const ProductCard = ({ product }) => {
                         </p>
                     )}
                 </div>
-                <button className='bg-gray-500 text-white px-8 py-3 text-[10px] uppercase tracking-widest font-bold hover:bg-gray-800 transition-all mt-4 w-full flex items-center justify-center gap-2 cursor-pointer'>
+                <button onClick={() => handleAddToCard()} className='bg-gray-500 text-white px-5 py-3 text-[10px] uppercase tracking-widest font-bold hover:bg-gray-800 transition-all mt-4 w-full flex items-center justify-center gap-2 cursor-pointer'>
                     <ShoppingCart size={14} />
-                    Giỏ hàng
+                    Thêm vào giỏ hàng
                 </button>
             </div>
         </div>

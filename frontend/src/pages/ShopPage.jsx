@@ -4,6 +4,7 @@ import ProductCard from '../components/productCard/ProductCard'
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import api from '../utils/Axios.js'
 import Pagination from '../components/ui/Pagination.jsx';
+import TableSkeleton from '../components/ui/TableSkeleton';
 
 const ShopPage = () => {
     const [products, setProduct] = useState([])
@@ -26,8 +27,13 @@ const ShopPage = () => {
         }
         fetchProducts()
     }, [page])
-    if (loading)
-        return <div className="p-20 text-center font-serif text-xl">Đang tải sản phẩm...</div>
+
+    if (loading) return (
+        <div className="p-10">
+            <TableSkeleton rows={8} />
+        </div>
+    )
+
     return (
 
         <main className='min-h-screen bg-white'>

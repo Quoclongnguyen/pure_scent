@@ -1,54 +1,20 @@
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Trash2, ChevronRight, ArrowLeft } from 'lucide-react'
+import CartContext from '../context/CartContext'
 
-
-const initialCart = [
-    {
-        id: 1,
-        name: "Santal 33",
-        brand: "Le Labo",
-        price: 5500000,
-        size: "100ml",
-        image: "/src/assets/img1.png",
-        quantity: 1
-    },
-    {
-        id: 2,
-        name: "Another 13",
-        brand: "Le Labo",
-        price: 5200000,
-        size: "50ml",
-        image: "/src/assets/img1.png",
-        quantity: 1
-    }
-];
 
 const CartPage = () => {
-    const [cartItems, setCartItems] = useState(initialCart);
+    const { cartItems, removeFromCart, updateQuantity, cartTotal } = useContext(CartContext)
+
+
     const [voucher, setVoucher] = useState("");
-
-    const updateQuantity = (id, amount) => {
-        setCartItems(prev => prev.map(item =>
-            item.id === id
-                ? { ...item, quantity: Math.max(1, item.quantity + amount) }
-                : item
-        ));
-    };
-
-    const removeItem = (id) => {
-        setCartItems(prev =>
-            prev.filter(item => item.id !== id));
-    };
-
-    //Tính tổng tiền
-    const subtotal = cartItems.reduce((acc, item) =>
-        acc + (item.price * item.quantity), 0);
     // tính phí ship nếu tổng đơn dưới 5tr
-    const shipping = subtotal > 5000000
+    const shipping = cartTotal > 5000000
         ? 0
         : 35000;
-    const total = subtotal + shipping;
+
+    const total = cartTotal + shipping;
 
     const formatPrice = (num) => {
         return num.toLocaleString('vi-VN') + 'đ';
@@ -116,9 +82,10 @@ const CartPage = () => {
                                     <div className="flex flex-col justify-center space-y-1">
                                         <p className="text-[10px] uppercase tracking-widest text-gray-400 font-bold">{item.brand}</p>
                                         <h3 className="font-serif text-lg leading-tight">{item.name}</h3>
-                                        <p className="text-xs text-gray-400">Dung tích: <span className="text-black font-medium">{item.size}</span></p>
+                                        <p className="text-xs text-gray-400">Dung tích:
+                                            <span className="text-black font-medium">{item.size}</span></p>
                                         <button
-                                            onClick={() => removeItem(item.id)}
+                                            onClick={() => removeFromCart(item.id, item.size)}
                                             className="text-[10px] uppercase tracking-widest text-gray-400 hover:text-black transition-colors pt-4 text-left w-fit cursor-pointer"
                                         >
                                             Xóa sản phẩm
@@ -135,13 +102,13 @@ const CartPage = () => {
                                 <div className="col-span-2 flex justify-center">
                                     <div className="flex items-center border border-gray-100">
                                         <button
-                                            onClick={() => updateQuantity(item.id, -1)}
+                                            onClick={() => updateQuantity(item.id, item.size, -1)}
                                             className="px-3 py-2 hover:bg-gray-50 transition-colors cursor-pointer"
                                         >-</button>
                                         <span className="w-8 text-center text-xs font-medium">{item.quantity}</span>
 
                                         <button
-                                            onClick={() => updateQuantity(item.id, 1)}
+                                            onClick={() => updateQuantity(item.id, item.size, 1)}
                                             className="px-3 py-2 hover:bg-gray-50 transition-colors cursor-pointer"
                                         >+</button>
 
@@ -169,7 +136,7 @@ const CartPage = () => {
                         <div className="space-y-4">
                             <div className="flex justify-between text-sm">
                                 <span className="text-gray-400">Tạm tính</span>
-                                <span>{formatPrice(subtotal)}</span>
+                                <span>{formatPrice(cartTotal)}</span>
                             </div>
                             <div className="flex justify-between text-sm">
                                 <span className="text-gray-400">Phí vận chuyển</span>

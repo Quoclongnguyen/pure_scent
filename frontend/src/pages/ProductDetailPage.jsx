@@ -1,9 +1,12 @@
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { ShoppingBag, ChevronRight, ChevronLeft, Star, Heart } from 'lucide-react'
 import ProductCard from '../components/productCard/ProductCard'
 import { getImageUrl } from '../utils/helpers';
 import api from '../utils/Axios.js'
+import { toast } from 'sonner';
+import CartContext from '../context/CartContext';
+import TableSkeleton from '../components/ui/TableSkeleton';
 
 const ProductDetailPage = () => {
     const { id } = useParams()
@@ -16,6 +19,9 @@ const ProductDetailPage = () => {
 
     const [activeTab, setActiveTab] = useState('description')// Quản lý Tab nào đang mở
     const [isExpanded, setIsExpanded] = useState(false) // Ấn Xem thêm
+
+    const { addToCart } = useContext(CartContext)
+
     const fetchProduct = async () => {
         try {
             const { data } = await api.get(`/api/products/${id}`)
@@ -26,6 +32,7 @@ const ProductDetailPage = () => {
             }
         } catch (error) {
             console.error('Lỗi khi lấy chi tiết sản phẩm ', error)
+            toast.error('Lỗi khi lấy sản phẩm')
         } finally {
             setLoading(false)
         }
@@ -45,6 +52,23 @@ const ProductDetailPage = () => {
         fetchProduct()
         fetchProducts()
     }, [])
+
+
+    const handleAddToCard = async () => {
+        try {
+
+            if (selectedVariant) {
+                addToCart(product, selectedVariant, quantity)
+                toast.success(`Đã thêm ${product.name} (${selectedVariant.size}) vào giõ hàng!`)
+            }
+            else {
+                toast.error("Vui lòng chọn dung tích!")
+            }
+        } catch (error) {
+            console.log('Lỗi khi thêm vào giõ hàng')
+        }
+
+    }
 
     if (loading) return (
         <div className="p-10">
@@ -189,7 +213,8 @@ const ProductDetailPage = () => {
                                     className="px-4 py-3 hover:bg-gray-50 transition-colors"
                                 >+</button>
                             </div>
-                            <button className="flex-1 bg-black text-white flex items-center justify-center gap-3 py-4 text-xs font-bold uppercase tracking-widest hover:bg-gray-800 transition-all cursor-pointer">
+                            <button onClick={() => handleAddToCard()}
+                                className="flex-1 bg-black text-white flex items-center justify-center gap-3 py-4 text-xs font-bold uppercase tracking-widest hover:bg-gray-800 transition-all cursor-pointer">
                                 <ShoppingBag size={18} />
                                 Thêm vào giỏ hàng
                             </button>
