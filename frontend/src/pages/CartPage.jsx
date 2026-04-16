@@ -73,7 +73,7 @@ const CartPage = () => {
                     {/* Cart Items */}
                     <div className="space-y-8">
                         {cartItems.map((item) => (
-                            <div key={item.id} className="grid grid-cols-1 md:grid-cols-12 items-center gap-6 md:gap-0 pb-8 border-b border-gray-50 group">
+                            <div key={`${item.id}-${item.size}`} className="grid grid-cols-1 md:grid-cols-12 items-center gap-6 md:gap-0 pb-8 border-b border-gray-50 group">
                                 {/* Info */}
                                 <div className="col-span-6 flex gap-6">
                                     <div className="w-24 h-32 bg-[#fcfcfc] overflow-hidden rounded-sm">

@@ -4,6 +4,7 @@ import { ShoppingCart, User, Search } from 'lucide-react';
 import AuthContext from '../../context/AuthContext';
 import api from '../../utils/Axios.js'
 import CartContext from '../../context/CartContext';
+import { toast } from 'sonner';
 const Navbar = () => {
     const { userInfo, logout } = useContext(AuthContext)
     const { cartCount } = useContext(CartContext)
@@ -11,7 +12,7 @@ const Navbar = () => {
         try {
             await api.post('api/users/logout')
             logout()
-            alert("Đã đăng xuất")
+            toast.success("Đã đăng xuất")
         } catch (error) {
             console.error("Lỗi đăng xuất", error)
         }
