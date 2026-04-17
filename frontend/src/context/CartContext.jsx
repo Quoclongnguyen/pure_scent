@@ -118,7 +118,7 @@ export const CartProvider = ({ children }) => {
         if (userInfo) {
             try {
                 await api.post('/api/cart/remove', {
-                    productId: productId, size
+                    product: productId, size
                 })
             } catch (error) {
                 console.error("Lỗi xóa sản phẩm trên server:", error)
