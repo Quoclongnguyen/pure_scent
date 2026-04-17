@@ -1,21 +1,25 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import ProductCard from '../components/productCard/ProductCard'
-const mockProducts = [
-    { id: 1, name: "Santal 33", brand: "Le Labo", gender: "Unisex", price: "5.500.000đ", image: "/src/assets/img1.png" },
-    { id: 2, name: "Another 13", brand: "Le Labo", gender: "Men", price: "5.200.000đ", image: "/src/assets/img1.png" },
-    { id: 3, name: "Rose 31", brand: "Le Labo", gender: "Women", price: "4.800.000đ", image: "/src/assets/img1.png" },
-    { id: 5, name: "Lys 41", brand: "Le Labo", gender: "Women", price: "5.000.000đ", image: "/src/assets/img1.png" },
-    { id: 6, name: "Lys 41", brand: "Le Labo", gender: "Men", price: "5.000.000đ", image: "/src/assets/img1.png" },
-    { id: 7, name: "Lys 41", brand: "Le Labo", gender: "Women", price: "5.000.000đ", image: "/src/assets/img1.png" },
-    { id: 8, name: "Lys 41", brand: "Le Labo", gender: "Men", price: "5.000.000đ", image: "/src/assets/img1.png" },
-    { id: 9, name: "Lys 41", brand: "Le Labo", gender: "Men", price: "5.000.000đ", image: "/src/assets/img1.png" },
-
-];
+import api from '../utils/Axios'
+import { Link } from 'react-router-dom'
 const HomePage = () => {
     const [filter, setFilter] = useState("All")
+    const [loading, setLoading] = useState(true)
+    const [products, setProducts] = useState([])
 
-    const filterredProducts = filter === "All" ? mockProducts : mockProducts.filter(p => p.gender === filter)
-
+    const fetchProducts = async () => {
+        try {
+            const res = await api.get('/api/products')
+            setProducts(res.data.products)
+            setLoading(false)
+        } catch (error) {
+            console.error("Lỗi khi Get sản phẩm: ", error)
+            setLoading(false)
+        }
+    }
+    useEffect(() => {
+        fetchProducts()
+    }, [])
     return (
         <>
             <main className='min-h-screen bg-white'>
@@ -78,14 +82,15 @@ const HomePage = () => {
 
                     {/* Grid chia 4 cột trên máy tính, 2 cột trên điện thoại */}
                     <div className='grid grid-cols-2 lg:grid-cols-4 gap-10'>
-                        {filterredProducts.map((item) => (
-                            <ProductCard key={item.id} product={item} />
+                        {products.map((item) => (
+                            <div key={item._id} className="opacity-80 hover:opacity-100 transition-opacity">
+                                <ProductCard product={item} />
+                            </div>
                         ))}
-
                     </div>
-                    <div className='flex justify-center items-center mt-8'>
-                        <button className='bg-gray-500 text-white  p-4 uppercase text-xs tracking-widest hover:bg-gray-800 transition-all font-medium cursor-pointer'>
-                            Xem tất cả</button>
+                    <div className='flex justify-center items-center mt-8 text-white '>
+                        <Link to="/shop" className='bg-gray-500  p-4 uppercase text-xs tracking-widest hover:bg-gray-800 transition-all font-medium cursor-pointer'>
+                            Xem tất cả</Link>
                     </div>
 
 

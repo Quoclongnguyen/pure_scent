@@ -38,6 +38,8 @@ const LoginPage = () => {
         } catch (error) {
             console.log("lỗi khi đăng nhập".error)
             setError(error.response?.data?.message || "Đã có lỗi xảy ra!");
+            toast.error("Đăng nhập không thành công!");
+
         }
     };
 

@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { User, Mail, Lock, ShieldCheck, ArrowRight, Eye, EyeOff } from 'lucide-react'
 import api from '../utils/Axios.js'
 import { AuthContext } from '../context/AuthContext' // Kho lưu trữ thông tin
+import { toast } from 'sonner'
 
 
 const RegisterPage = () => {
@@ -36,10 +37,12 @@ const RegisterPage = () => {
                 password: formData.password
             })
             login(res.data)
-            alert("Đăng ký thành công")
+            toast.success("Đăng ký thành công")
             navigate('/');
         } catch (error) {
             setError(error.response?.data?.message || "Đã có lỗi xảy ra!"); // nếu err thông báo từ server
+            toast.error("Đăng ký không thành công")
+
         }
     }
 

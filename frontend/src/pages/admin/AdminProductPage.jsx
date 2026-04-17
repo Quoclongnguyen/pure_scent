@@ -309,18 +309,30 @@ const AdminProductPage = () => {
         setActiveTab('basic')
     }
 
-    const hanldeDelete = async (id) => {
-        try {
-            if (window.confirm('Xác nhận xóa sản phẩm')) {
-                await api.delete(`/api/products/${id} `)
+    const handleDelete = (id) => {
+        toast('Xác nhận xóa sản phẩm?', {
+            description: 'Hành động này không thể hoàn tác.',
+            action: {
+                label: 'Xóa ngay',
+                onClick: () => executeDelete(id)
+            },
+            cancel: {
+                label: 'Hủy'
             }
+        })
+    }
+
+    const executeDelete = async (id) => {
+        try {
+            setLoading(true)
+            await api.delete(`/api/products/${id}`)
+            toast.success('Đã xóa sản phẩm thành công!')
             fetchProducts()
-            toast.success('Bạn đã xóa thành công!')
-            alert('')
         } catch (error) {
             console.error("Lỗi khi xóa sản phẩm: ", error)
-            toast.error('Có lỗi Khi xóa sản phẩm, vui lòng kiểm tra lại!')
-
+            toast.error(error.response?.data?.message || 'Có lỗi khi xóa sản phẩm!')
+        } finally {
+            setLoading(false)
         }
     }
 
@@ -401,7 +413,7 @@ const AdminProductPage = () => {
                                 <td className="p-6 text-right">
                                     <div className="flex justify-end gap-4">
                                         <button onClick={() => { handleEdit(product) }} className="text-gray-400 hover:text-black transition-colors"><Edit2 size={16} /></button>
-                                        <button onClick={() => hanldeDelete(product._id)} className="text-gray-400 hover:text-red-500 transition-colors"><Trash2 size={16} /></button>
+                                        <button onClick={() => handleDelete(product._id)} className="text-gray-400 hover:text-red-500 transition-colors"><Trash2 size={16} /></button>
                                     </div>
 
                                 </td>
