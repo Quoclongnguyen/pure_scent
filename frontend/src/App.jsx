@@ -11,6 +11,8 @@ import BrandPage from './pages/BrandPage'
 import ProductDetailPage from './pages/ProductDetailPage'
 import CartPage from './pages/CartPage'
 import CheckoutPage from './pages/CheckoutPage'
+import OrderDetailsPage from './pages/OrderDetailsPage'
+
 import RegisterPage from './pages/RegisterPage'
 import AdminLayout from './pages/admin/AdminLayout'
 import AdminProductPage from './pages/admin/AdminProductPage'
@@ -55,6 +57,9 @@ function App() {
           <Route path='/login' element={<LoginPage />} />
 
           <Route path='/register' element={<RegisterPage />} />
+
+          <Route path="/order/:id" element={<OrderDetailsPage />} />
+
 
           <Route path='/profile' element={<div className="p-20 text-center font-serif text-2xl">Đang tiến hành</div>} />
           <Route path='//about' element={<div className="p-20 text-center font-serif text-2xl">Đang tiến hành</div>} />

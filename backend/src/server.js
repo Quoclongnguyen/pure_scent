@@ -12,6 +12,7 @@ import path from "path"
 import uploadRoutes from './routes/uploadRoutes.js'
 import brandRoutes from "./routes/brandRoutes.js"
 import cartRoutes from "./routes/cartRoutes.js"
+import orderRoutes from "./routes/orderRoutes.js"
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -46,6 +47,7 @@ app.use("/api/categories", categoryRouters)
 app.use('/api/upload', uploadRoutes)
 app.use("/api/brands", brandRoutes)
 app.use("/api/cart", cartRoutes)
+app.use("/api/orders", orderRoutes)
 // Basic route
 app.get("/", (req, res) => {
   res.send("PureScent API is running...");
