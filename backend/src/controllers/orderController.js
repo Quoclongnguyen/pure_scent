@@ -68,3 +68,50 @@ export const getMyOrders = async (req, res) => {
         res.status(500).json({ message: "Lỗi server", error: error.message });
     }
 };
+
+// Lấy tất cả đơn hàng (Chỉ dành cho Admin)
+export const getOrders = async (req, res) => {
+    try {
+        const orders = await Order.find({}).populate("user", "id name").sort({ createdAt: -1 });
+        res.json(orders);
+    } catch (error) {
+        res.status(500).json({ message: "Lỗi server", error: error.message });
+    }
+};
+
+// Cập nhật trạng thái đã thanh toán (Chỉ dành cho Admin)
+export const updateOrderToPaid = async (req, res) => {
+    try {
+        const order = await Order.findById(req.params.id);
+        if (order) {
+            order.isPaid = true;
+            order.paidAt = Date.now();
+            // Nếu bạn muốn lưu thêm thông tin từ cổng thanh toán thì thêm vào đây
+            // order.paymentResult = { id: req.body.id, status: req.body.status, ... }
+            const updatedOrder = await order.save();
+            res.json(updatedOrder);
+        } else {
+            res.status(404).json({ message: "Không tìm thấy đơn hàng" });
+        }
+    } catch (error) {
+        res.status(500).json({ message: "Lỗi server", error: error.message });
+    }
+};
+
+//Cập nhật trạng thái đã giao
+export const updateOrderToDelivered = async (req, res) => {
+    try {
+        const order = await Order.findById(req.params.id);
+        if (order) {
+            order.isDelivered = true;
+            order.deliveredAt = Date.now();
+            order.status = "Đã giao hàng"; // Cập nhật text trạng thái
+            const updatedOrder = await order.save();
+            res.json(updatedOrder);
+        } else {
+            res.status(404).json({ message: "Không tìm thấy đơn hàng" });
+        }
+    } catch (error) {
+        res.status(500).json({ message: "Lỗi server", error: error.message });
+    }
+};
