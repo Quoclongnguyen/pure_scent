@@ -12,6 +12,9 @@ import ProductDetailPage from './pages/ProductDetailPage'
 import CartPage from './pages/CartPage'
 import CheckoutPage from './pages/CheckoutPage'
 import OrderDetailsPage from './pages/OrderDetailsPage'
+import ProfilePage from './pages/ProfilePage'
+import AboutPage from './pages/AboutPage'
+import ContactPage from './pages/ContactPage'
 
 import RegisterPage from './pages/RegisterPage'
 import AdminLayout from './pages/admin/AdminLayout'
@@ -19,9 +22,17 @@ import AdminProductPage from './pages/admin/AdminProductPage'
 import AdminOrderPage from './pages/admin/AdminOrderPage'
 import AdminCategoryPage from './pages/admin/AdminCategoryPage'
 import AdminBrandPage from './pages/admin/AdminBrandPage'
+import AdminUserPage from './pages/admin/AdminUserPage'
 import { useContext } from 'react'
 import AuthContext from './context/AuthContext'
 import AdminRoute from './components/auth/AdminRoute'
+import SuperAdminRoute from './components/auth/SuperAdminRoute'
+
+const AdminIndexRedirect = () => {
+  const { userInfo } = useContext(AuthContext);
+  const isSuperAdmin = userInfo && (userInfo.role === 'superAdmin' || (userInfo.isAdmin && (!userInfo.role || userInfo.role === 'user')));
+  return <Navigate to={isSuperAdmin ? "/admin/dashboard" : "/admin/orders"} replace />;
+};
 
 function App() {
 
@@ -60,10 +71,9 @@ function App() {
 
           <Route path="/order/:id" element={<OrderDetailsPage />} />
 
-
-          <Route path='/profile' element={<div className="p-20 text-center font-serif text-2xl">Đang tiến hành</div>} />
-          <Route path='//about' element={<div className="p-20 text-center font-serif text-2xl">Đang tiến hành</div>} />
-          <Route path='//contact' element={<div className="p-20 text-center font-serif text-2xl">Đang tiến hành</div>} />
+          <Route path='/profile' element={<ProfilePage />} />
+          <Route path='/about' element={<AboutPage />} />
+          <Route path='/contact' element={<ContactPage />} />
 
 
           <Route path='/unauthorized' element={
@@ -88,23 +98,17 @@ function App() {
           path='/admin'
           element={<AdminRoute />} >
           <Route element={<AdminLayout />}>
-            <Route index element={<Navigate to="/admin/dashboard" replace />} />
-            <Route
-              path='dashboard'
-              element={<div className="text-xl font-serif">Chào mừng quay lại, Admin</div>} />
-            <Route
-              path='products'
-              element={<AdminProductPage />} />
-            <Route
-              path='orders'
-              element={<AdminOrderPage />} />
-            <Route
-              path='categories'
-              element={<AdminCategoryPage />} />
+            <Route index element={<AdminIndexRedirect />} />
 
-            <Route
-              path='brands'
-              element={<AdminBrandPage />} />
+            <Route element={<SuperAdminRoute />}>
+              <Route path='dashboard' element={<div className="text-xl font-serif">Chào mừng quay lại, Admin</div>} />
+              <Route path='users' element={<AdminUserPage />} />
+            </Route>
+
+            <Route path='products' element={<AdminProductPage />} />
+            <Route path='orders' element={<AdminOrderPage />} />
+            <Route path='categories' element={<AdminCategoryPage />} />
+            <Route path='brands' element={<AdminBrandPage />} />
           </Route>
 
 
