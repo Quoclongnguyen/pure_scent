@@ -31,4 +31,15 @@ const admin = (req, res, next) => {
   }
 };
 
-export { protect, admin };
+// Người dùng phải là Super Admin
+const superAdmin = (req, res, next) => {
+  // Backwards compatibility for the original admin who has no role assigned yet
+  const isOriginalAdmin = req.user && req.user.isAdmin && (!req.user.role || req.user.role === 'user');
+  if (req.user && (req.user.role === 'superAdmin' || isOriginalAdmin)) {
+    next();
+  } else {
+    res.status(401).json({ message: "Chỉ Super Admin (Chủ cửa hàng) mới có quyền này" });
+  }
+};
+
+export { protect, admin, superAdmin };
