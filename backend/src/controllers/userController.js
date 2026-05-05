@@ -17,6 +17,7 @@ const authUser = async (req, res) => {
       name: user.name,
       email: user.email,
       isAdmin: user.isAdmin,
+      role: user.role,
     });
   } else {
     res.status(401).json({ message: "Invalid email or password" });
@@ -50,6 +51,7 @@ const registerUser = async (req, res) => {
       name: user.name,
       email: user.email,
       isAdmin: user.isAdmin,
+      role: user.role,
     });
   } else {
     res.status(400).json({ message: "Invalid user data" });
@@ -80,6 +82,7 @@ const getUserProfile = async (req, res) => {
       name: user.name,
       email: user.email,
       isAdmin: user.isAdmin,
+      role: user.role,
     });
   } else {
     res.status(404).json({ message: "User not found" });
@@ -94,10 +97,57 @@ const getUsers = async (req, res) => {
   res.status(200).json(users);
 };
 
+
+//   Private/Admin
+const deleteUser = async (req, res) => {
+  const user = await User.findById(req.params.id);
+
+  if (user) {
+    if (user.isAdmin) {
+      res.status(400).json({ message: "Không thể xóa tài khoản Admin" });
+      return;
+    }
+    await User.deleteOne({ _id: user._id });
+    res.json({ message: "Đã xóa người dùng thành công" });
+  } else {
+    res.status(404).json({ message: "Không tìm thấy người dùng" });
+  }
+};
+
+// @desc    Update user role
+// @route   PUT /api/users/:id/role
+// @access  Private/SuperAdmin
+const updateUserRole = async (req, res) => {
+  const user = await User.findById(req.params.id);
+
+  if (user) {
+    if (user._id.toString() === req.user._id.toString()) {
+        res.status(400).json({ message: "Không thể tự đổi quyền của chính mình" });
+        return;
+    }
+    user.role = req.body.role || user.role;
+    user.isAdmin = (user.role === 'staff' || user.role === 'superAdmin');
+
+    const updatedUser = await user.save();
+
+    res.json({
+      _id: updatedUser._id,
+      name: updatedUser.name,
+      email: updatedUser.email,
+      isAdmin: updatedUser.isAdmin,
+      role: updatedUser.role,
+    });
+  } else {
+    res.status(404).json({ message: "Không tìm thấy người dùng" });
+  }
+};
+
 export {
   authUser,
   registerUser,
   logoutUser,
   getUserProfile,
   getUsers,
+  deleteUser,
+  updateUserRole,
 };
