@@ -23,6 +23,7 @@ import AdminOrderPage from './pages/admin/AdminOrderPage'
 import AdminCategoryPage from './pages/admin/AdminCategoryPage'
 import AdminBrandPage from './pages/admin/AdminBrandPage'
 import AdminUserPage from './pages/admin/AdminUserPage'
+import AdminDashboardPage from './pages/admin/AdminDashboardPage'
 import { useContext } from 'react'
 import AuthContext from './context/AuthContext'
 import AdminRoute from './components/auth/AdminRoute'
@@ -101,7 +102,7 @@ function App() {
             <Route index element={<AdminIndexRedirect />} />
 
             <Route element={<SuperAdminRoute />}>
-              <Route path='dashboard' element={<div className="text-xl font-serif">Chào mừng quay lại, Admin</div>} />
+              <Route path='dashboard' element={<AdminDashboardPage />} />
               <Route path='users' element={<AdminUserPage />} />
             </Route>
 
