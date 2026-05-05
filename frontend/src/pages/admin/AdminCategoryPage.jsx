@@ -66,61 +66,50 @@ const AdminCategoryPage = () => {
 
 
     return (
-        <div className="max-w-4xl space-y-10 animate-in fade-in duration-700">
-            {/* --- HEADER & QUICK ADD --- */}
-            <div className="flex justify-between bg-white p-10 border border-gray-100 shadow-sm space-y-4">
+        <div className='bg-white border border-gray-100 shadow-sm overflow-hidden animate-in fade-in duration-500'>
+            <div className='flex flex-col sm:flex-row justify-between items-start sm:items-center bg-white p-6 border-b border-gray-100 gap-4'>
                 <div>
-                    <h1 className="text-2xl font-serif tracking-widest text-black">Quản lý Danh mục</h1>
-                    <p className="text-[11px] text-gray-400 uppercase tracking-[0.2em] mt-2 font-medium">Phân loại các nhóm hương tinh hoa</p>
+                    <h2 className='font-serif text-2xl tracking-widest uppercase'>Quản lý Danh mục</h2>
+                    <p className="text-[10px] text-gray-400 uppercase tracking-widest mt-1">Phân loại các nhóm hương tinh hoa</p>
                 </div>
-
-                <div className=" gap-4">
-                    <div className="relative flex-1 group">
-                        <button
-                            onClick={() => setIsModalOpen(true)}
-                            className="bg-black text-white px-10 py-4 text-[10px] uppercase font-bold tracking-[0.3em] hover:bg-gray-800 transition-all flex items-center gap-3 shrink-0 cursor-pointer"
-                        >
-                            <Plus size={16} /> Thêm nhanh
-                        </button>
-                    </div>
-
-                </div>
+                <button onClick={() => setIsModalOpen(true)}
+                    className='bg-black text-white px-6 py-3 text-[10px] uppercase font-bold tracking-widest flex items-center gap-2 hover:bg-gray-800 transition-all cursor-pointer shrink-0'
+                >
+                    <Plus size={16} />Thêm danh mục mới
+                </button>
             </div>
 
-
-            <div className="grid grid-cols-1 gap-4">
-                {categories.map((category) => (
-                    <div
-                        key={category._id}
-                        className="group bg-white border border-gray-50 p-6 flex items-center justify-between hover:shadow-xl hover:shadow-black/5 hover:border-gray-200 transition-all duration-500"
-                    >
-                        <div className="flex items-center gap-6">
-                            <div className="w-12 h-12 bg-gray-50 rounded-full flex items-center justify-center text-gray-300 group-hover:bg-black group-hover:text-white transition-all duration-500">
-                                <Tag size={20} strokeWidth={1.5} />
-                            </div>
-                            <div>
-                                <div className="flex items-center gap-4">
-                                    <h3 className="text-sm font-bold tracking-tight text-gray-900">{category.name}</h3>
-                                    <span className="bg-gray-100 text-[10px] px-2 py-0.5 rounded text-gray-400 font-bold">{category.count} sản phẩm</span>
-                                </div>
-                                <p className="text-xs text-gray-400 mt-1 italic">{category.description}</p>
-                            </div>
-                        </div>
-
-                        <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                            <button
-                                onClick={() => handleEdit(category)}
-                                className="p-3 text-gray-300 hover:text-black hover:bg-gray-50 transition-all rounded-full">
-                                <Edit3 size={16} />
-                            </button>
-                            <button
-                                onClick={() => handleDelete(category._id)}
-                                className="p-3 text-gray-300 hover:text-red-500 hover:bg-red-50 transition-all rounded-full">
-                                <Trash2 size={16} />
-                            </button>
-                        </div>
-                    </div>
-                ))}
+            <div className="overflow-x-auto">
+                <table className="w-full border-collapse min-w-[800px]">
+                    <thead>
+                        <tr className="border-b border-gray-100 text-[10px] uppercase tracking-[0.2em] text-gray-400 bg-gray-50">
+                            <th className="p-4 text-left font-bold">Tên Danh mục</th>
+                            <th className="p-4 text-left font-bold">Mô tả</th>
+                            <th className="p-4 text-center font-bold">Số lượng SP</th>
+                            <th className="p-4 text-right font-bold">Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-50">
+                        {categories.map((category) => (
+                            <tr key={category._id} className="hover:bg-gray-50/50 transition-colors group">
+                                <td className="p-4 text-sm font-bold tracking-wide flex items-center gap-3">
+                                    <Tag size={16} className="text-gray-400" />
+                                    {category.name}
+                                </td>
+                                <td className="p-4 text-xs text-gray-500 max-w-xs truncate">{category.description || '---'}</td>
+                                <td className="p-4 text-center">
+                                    <span className="bg-gray-100 text-[10px] px-2 py-0.5 rounded text-gray-500 font-bold">{category.count || 0} SP</span>
+                                </td>
+                                <td className="p-4 text-right">
+                                    <div className="flex justify-end gap-3 opacity-0 group-hover:opacity-100 transition-opacity">
+                                        <button onClick={() => handleEdit(category)} className="p-2 text-gray-400 hover:text-black transition-colors" title="Sửa danh mục"><Edit3 size={16} /></button>
+                                        <button onClick={() => handleDelete(category._id)} className="p-2 text-gray-400 hover:text-red-500 transition-colors" title="Xóa danh mục"><Trash2 size={16} /></button>
+                                    </div>
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
             </div>
 
             {isModalOpen && (
