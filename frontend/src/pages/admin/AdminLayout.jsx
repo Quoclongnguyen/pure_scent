@@ -2,8 +2,13 @@ import React from 'react'
 import { Link, Outlet, useLocation } from 'react-router-dom'
 import { LayoutDashboard, Package, ShoppingCart, Layers, LogOut, Bell, User, Bandage, Award } from 'lucide-react'
 
+import AuthContext from '../../context/AuthContext'
+import { useContext } from 'react'
+
 const AdminLayout = () => {
     const location = useLocation();
+    const { userInfo } = useContext(AuthContext);
+    const isSuperAdmin = userInfo && (userInfo.role === 'superAdmin' || (userInfo.isAdmin && (!userInfo.role || userInfo.role === 'user')));
 
     const menuItems = [
         {
@@ -31,7 +36,16 @@ const AdminLayout = () => {
             icon: <Award size={18} />,
             label: 'Thương hiệu'
         },
+        {
+            path: '/admin/users',
+            icon: <User size={18} />,
+            label: 'Người dùng'
+        },
     ];
+
+    const filteredMenuItems = isSuperAdmin 
+        ? menuItems 
+        : menuItems.filter(item => !['/admin/dashboard', '/admin/users'].includes(item.path));
 
     return (
         <div className="flex min-h-screen bg-[#f8f9fa]">
@@ -48,7 +62,7 @@ const AdminLayout = () => {
 
                 {/* Navigation */}
                 <nav className="flex-1 p-4 space-y-2 mt-6">
-                    {menuItems.map((item) => (
+                    {filteredMenuItems.map((item) => (
                         <Link
                             key={item.path}
                             to={item.path}
@@ -88,8 +102,8 @@ const AdminLayout = () => {
                         </button>
                         <div className="flex items-center gap-3 pl-8 border-l border-gray-100">
                             <div className="text-right">
-                                <p className="text-[10px] font-bold uppercase tracking-widest">Admin Name</p>
-                                <p className="text-[9px] text-gray-400">Super Admin</p>
+                                <p className="text-[10px] font-bold uppercase tracking-widest">{userInfo?.name || 'Admin'}</p>
+                                <p className="text-[9px] text-gray-400">{isSuperAdmin ? 'Super Admin' : 'Staff'}</p>
                             </div>
                             <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center">
                                 <User size={20} strokeWidth={1.5} className="text-gray-400" />
