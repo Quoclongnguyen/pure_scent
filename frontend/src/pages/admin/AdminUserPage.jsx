@@ -4,10 +4,14 @@ import api from '../../utils/Axios.js'
 import { toast } from 'sonner'
 import AuthContext from '../../context/AuthContext'
 import { useContext } from 'react'
+import Pagination from '../../components/ui/Pagination.jsx'
+import TableSkeleton from '../../components/ui/TableSkeleton.jsx'
 
 const AdminUserPage = () => {
     const [users, setUsers] = useState([])
     const [loading, setLoading] = useState(true)
+    const [currentPage, setCurrentPage] = useState(1)
+    const itemsPerPage = 10
     const { userInfo } = useContext(AuthContext)
     const isSuperAdmin = userInfo.role === 'superAdmin' || (userInfo.isAdmin && (!userInfo.role || userInfo.role === 'user'))
 
@@ -60,6 +64,15 @@ const AdminUserPage = () => {
         }
     }
 
+    const totalPages = Math.ceil(users.length / itemsPerPage)
+    const currentUsers = users.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
+
+    if (loading) return (
+        <div className="p-10">
+            <TableSkeleton rows={8} />
+        </div>
+    )
+
     return (
         <div className="space-y-8 animate-in fade-in duration-500">
             {/* HEADER */}
@@ -75,9 +88,7 @@ const AdminUserPage = () => {
 
             {/* TABLE */}
             <div className="bg-white border border-gray-100 shadow-sm overflow-x-auto">
-                {loading ? (
-                    <div className="p-10 text-center text-sm font-serif italic text-gray-400">Đang tải dữ liệu...</div>
-                ) : users.length === 0 ? (
+                {users.length === 0 ? (
                     <div className="p-10 text-center text-sm font-serif italic text-gray-400">Không có người dùng nào.</div>
                 ) : (
                     <table className="w-full text-left border-collapse min-w-[800px]">
@@ -91,9 +102,9 @@ const AdminUserPage = () => {
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-50">
-                            {users.map((user, index) => (
+                            {currentUsers.map((user, index) => (
                                 <tr key={user._id} className="hover:bg-gray-50/50 transition-colors">
-                                    <td className="p-4 text-xs font-mono text-gray-400">{index + 1}</td>
+                                    <td className="p-4 text-xs font-mono text-gray-400">{(currentPage - 1) * itemsPerPage + index + 1}</td>
                                     <td className="p-4 text-sm font-bold">{user.name} {user._id === userInfo._id && <span className="text-[9px] uppercase tracking-widest text-emerald-500 font-bold ml-2">(Bạn)</span>}</td>
                                     <td className="p-4 text-sm text-gray-500">{user.email}</td>
                                     <td className="p-4 text-center">
@@ -144,6 +155,11 @@ const AdminUserPage = () => {
                             ))}
                         </tbody>
                     </table>
+                )}
+                {totalPages > 1 && (
+                    <div className='pb-10 pt-4 flex justify-center'>
+                        <Pagination page={currentPage} pages={totalPages} setPage={setCurrentPage} />
+                    </div>
                 )}
             </div>
         </div>

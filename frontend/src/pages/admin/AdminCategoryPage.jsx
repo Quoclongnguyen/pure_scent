@@ -2,17 +2,27 @@ import React, { useState } from 'react'
 import { Plus, Tag, Trash2, Edit3, ChevronRight, X } from 'lucide-react'
 import api from '../../utils/Axios.js'
 import { useEffect } from 'react';
-
+import Pagination from '../../components/ui/Pagination.jsx'
+import TableSkeleton from '../../components/ui/TableSkeleton.jsx'
 const AdminCategoryPage = () => {
-
     const [categories, setCategories] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 10;
     const [isModalOpen, setIsModalOpen] = useState(false)
     const [editId, setEditId] = useState(null)
     const [formData, setFormData] = useState({ name: '', description: '' });
 
     const fetchCategories = async () => {
-        const { data } = await api.get('/api/categories')
-        setCategories(data)
+        try {
+            setLoading(true)
+            const { data } = await api.get('/api/categories')
+            setCategories(data)
+        } catch (error) {
+            console.error("Lỗi khi tải danh mục:", error)
+        } finally {
+            setLoading(false)
+        }
     }
 
     useEffect(() => {
@@ -63,7 +73,14 @@ const AdminCategoryPage = () => {
             console.error('Lỗi khi xóa danh mục ', error)
         }
     }
+    const totalPages = Math.ceil(categories.length / itemsPerPage);
+    const currentCategories = categories.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
+    if (loading) return (
+        <div className="p-10">
+            <TableSkeleton rows={8} />
+        </div>
+    )
 
     return (
         <div className='bg-white border border-gray-100 shadow-sm overflow-hidden animate-in fade-in duration-500'>
@@ -90,7 +107,7 @@ const AdminCategoryPage = () => {
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-50">
-                        {categories.map((category) => (
+                        {currentCategories.map((category) => (
                             <tr key={category._id} className="hover:bg-gray-50/50 transition-colors group">
                                 <td className="p-4 text-sm font-bold tracking-wide flex items-center gap-3">
                                     <Tag size={16} className="text-gray-400" />
@@ -110,6 +127,11 @@ const AdminCategoryPage = () => {
                         ))}
                     </tbody>
                 </table>
+                {totalPages > 1 && (
+                    <div className='pb-10 pt-4 flex justify-center'>
+                        <Pagination page={currentPage} pages={totalPages} setPage={setCurrentPage} />
+                    </div>
+                )}
             </div>
 
             {isModalOpen && (

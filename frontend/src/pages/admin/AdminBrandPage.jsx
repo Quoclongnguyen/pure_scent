@@ -1,8 +1,14 @@
 import React, { useEffect, useState } from 'react'
 import api from '../../utils/Axios.js'
 import { Edit2, Plus, Trash2, X } from 'lucide-react'
+import Pagination from '../../components/ui/Pagination.jsx'
+import TableSkeleton from '../../components/ui/TableSkeleton.jsx'
+
 const AdminBrandPage = () => {
     const [brands, setBrands] = useState([])
+    const [loading, setLoading] = useState(true)
+    const [currentPage, setCurrentPage] = useState(1)
+    const itemsPerPage = 10
     const [isModalOpen, setIsModalOpen] = useState(false)
     const [formData, setFormData] = useState({ name: '', origin: '', description: '' })
     const [isEditing, setIsEditing] = useState(false)
@@ -10,11 +16,13 @@ const AdminBrandPage = () => {
 
     const fetchBrand = async () => {
         try {
+            setLoading(true)
             const res = await api.get('/api/brands')
             setBrands(res.data)
-
         } catch (error) {
             console.error("Lỗi khi lấy danh sách hãng:", error)
+        } finally {
+            setLoading(false)
         }
     }
 
@@ -50,6 +58,15 @@ const AdminBrandPage = () => {
         setIsEditing(false)
     }
 
+    const totalPages = Math.ceil(brands.length / itemsPerPage)
+    const currentBrands = brands.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
+
+    if (loading) return (
+        <div className="p-10">
+            <TableSkeleton rows={8} />
+        </div>
+    )
+
     return (
         <div className='bg-white border border-gray-100 shadow-sm overflow-hidden'>
             <div className='flex justify-between items-center bg-white  p-6 border border-gray-100 shadow-sm'>
@@ -73,7 +90,7 @@ const AdminBrandPage = () => {
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-50 ">
-                        {brands.map((brand) => (
+                        {currentBrands.map((brand) => (
                             <tr key={brand._id} className="hover:bg-gray-50/50 transition-colors group">
                                 <td className="p-6 text-sm font-bold tracking-wide">{brand.name}</td>
                                 <td className="p-6 text-xs text-gray-500 uppercase">{brand.origin || '---'}</td>
@@ -88,6 +105,11 @@ const AdminBrandPage = () => {
                         ))}
                     </tbody>
                 </table>
+                {totalPages > 1 && (
+                    <div className='pb-10 pt-4 flex justify-center'>
+                        <Pagination page={currentPage} pages={totalPages} setPage={setCurrentPage} />
+                    </div>
+                )}
             </div>
 
             {isModalOpen && (
