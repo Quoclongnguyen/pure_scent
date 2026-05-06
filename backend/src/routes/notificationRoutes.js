@@ -4,6 +4,8 @@ import {
     getUnreadCount,
     markAsRead,
     markAllAsRead,
+    deleteNotification,
+    deleteAllRead,
 } from "../controllers/notificationController.js";
 import { protect, admin } from "../middleware/authMiddleware.js";
 
@@ -13,6 +15,8 @@ const router = express.Router();
 router.route("/").get(protect, admin, getNotifications);
 router.route("/unread/count").get(protect, admin, getUnreadCount);
 router.route("/read-all").put(protect, admin, markAllAsRead);
-router.route("/:id/read").put(protect, admin, markAsRead);
 
+router.route("/delete/all-read").delete(protect, admin, deleteAllRead)
+router.route("/:id/read").put(protect, admin, markAsRead);
+router.route("/:id").delete(protect, admin, deleteNotification)
 export default router;

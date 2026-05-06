@@ -97,6 +97,12 @@ export const updateOrderToPaid = async (req, res) => {
             // Nếu bạn muốn lưu thêm thông tin từ cổng thanh toán thì thêm vào đây
             // order.paymentResult = { id: req.body.id, status: req.body.status, ... }
             const updatedOrder = await order.save();
+            await Notification.create({
+                message: `Đơn hàng #${order._id.toString().substring(0, 8)} - ${order.totalPrice.toLocaleString('vi-VN')}đ được thanh toán bởi  ${req.user.name}`,
+                type: 'payment_success',
+                orderId: order._id,
+                link: '/admin/orders',
+            });
             res.json(updatedOrder);
         } else {
             res.status(404).json({ message: "Không tìm thấy đơn hàng" });

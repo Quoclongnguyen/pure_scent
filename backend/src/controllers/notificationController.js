@@ -28,7 +28,7 @@ export const markAsRead = async (req, res) => {
         if (notification) {
             notification.isRead = true;
             await notification.save();
-            res.json({ message: "Đã đánh dấu đọc" });
+            res.json({ message: "Đã đánh dấu đọc", notification });
         } else {
             res.status(404).json({ message: "Không tìm thấy thông báo" });
         }
@@ -47,3 +47,25 @@ export const markAllAsRead = async (req, res) => {
         res.status(500).json({ message: "Lỗi server", error: error.message });
     }
 };
+
+
+export const deleteNotification = async (req, res) => {
+    try {
+        await Notification.findByIdAndDelete(req.params.id)
+        res.json({ message: 'Notification deleted' })
+    } catch (error) {
+        res.status(500).json({ message: error.message })
+    }
+}
+
+export const deleteAllRead = async (req, res) => {
+    try {
+        const result = await Notification.deleteMany({ isRead: true })
+        res.json({
+            message: `Deleted ${result.deletedCount} notifications`,
+            deletedCount: result.deletedCount
+        })
+    } catch (error) {
+        res.status(500).json({ message: error.message })
+    }
+}

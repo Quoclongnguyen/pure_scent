@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react'
-import { Bell, Package, X, CheckCheck } from 'lucide-react'
+import { Bell, X, CheckCheck, Trash2 } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import api from '../../utils/Axios.js'
+import { toast } from 'sonner'
 
 const TYPE_CONFIG = {
     new_order: {
@@ -97,6 +98,36 @@ const NotificationBell = () => {
         }
     }
 
+    const handleDeleteNotification = async (id) => {
+        try {
+            await api.delete(`/api/notifications/${id}`)
+            setNotifications(prev => {
+                const target = prev.find(n => n._id === id)
+                if (target && !target.isRead) setUnreadCount(c => Math.max(0, c - 1))
+                return prev.filter(n => n._id !== id)
+            })
+            toast.success("Xóa thông báo thành công ")
+        } catch (error) {
+            console.error('Lỗi xóa thông báo', error)
+            toast.error("Xóa thông báo không thành công ")
+
+        }
+    }
+
+    const handleDeleteAllRead = async () => {
+        if (!window.confirm('Xóa tất cả thông báo đã đọc?')) return
+        try {
+            await api.delete('/api/notifications/delete/all-read')
+            setNotifications(prev => prev.filter(n => !n.isRead))
+            toast.success("Xóa tất cả thông báo thành công ")
+
+        } catch (error) {
+            console.error('Lỗi xóa thông báo đã đọc', error)
+            toast.error("Xóa thông báo không thành công ")
+
+        }
+    }
+
     return (
         <div className="relative" ref={dropdownRef}>
             {/* Nút quả chuông */}
@@ -124,15 +155,28 @@ const NotificationBell = () => {
                                 <p className="text-[9px] text-gray-400 mt-0.5">{unreadCount} chưa đọc</p>
                             )}
                         </div>
-                        {unreadCount > 0 && (
-                            <button
-                                onClick={handleMarkAllAsRead}
-                                className="flex items-center gap-1 text-[9px] uppercase tracking-widest text-gray-400 hover:text-black transition-colors font-bold"
-                            >
-                                <CheckCheck size={12} />
-                                Đọc tất cả
-                            </button>
-                        )}
+                        <div className="flex items-center gap-3">
+                            {unreadCount > 0 && (
+                                <button
+                                    onClick={handleMarkAllAsRead}
+                                    className="flex items-center gap-1 text-[9px] uppercase tracking-widest text-gray-400 hover:text-black transition-colors font-bold"
+                                    title="Đánh dấu tất cả đã đọc"
+                                >
+                                    <CheckCheck size={12} />
+                                    Đọc hết
+                                </button>
+                            )}
+                            {notifications.some(n => n.isRead) && (
+                                <button
+                                    onClick={handleDeleteAllRead}
+                                    className="flex items-center gap-1 text-[9px] uppercase tracking-widest text-gray-400 hover:text-red-500 transition-colors font-bold"
+                                    title="Xóa tất cả đã đọc"
+                                >
+                                    <Trash2 size={12} />
+                                    Dọn
+                                </button>
+                            )}
+                        </div>
                     </div>
 
                     {/* Danh sách thông báo */}
@@ -157,15 +201,24 @@ const NotificationBell = () => {
                                             </p>
                                             <p className="text-[9px] text-gray-400 mt-1">{timeAgo(notification.createdAt)}</p>
                                         </div>
-                                        {!notification.isRead && (
+                                        <div className="flex flex-col gap-1.5 flex-shrink-0">
+                                            {!notification.isRead && (
+                                                <button
+                                                    onClick={() => handleMarkAsRead(notification._id)}
+                                                    className="text-gray-300 hover:text-blue-500 transition-colors"
+                                                    title="Đánh dấu đã đọc"
+                                                >
+                                                    <CheckCheck size={13} />
+                                                </button>
+                                            )}
                                             <button
-                                                onClick={() => handleMarkAsRead(notification._id)}
-                                                className="flex-shrink-0 text-gray-300 hover:text-gray-600 transition-colors mt-0.5"
-                                                title="Đánh dấu đã đọc"
+                                                onClick={() => handleDeleteNotification(notification._id)}
+                                                className="text-gray-300 hover:text-red-500 transition-colors"
+                                                title="Xóa thông báo"
                                             >
-                                                <X size={14} />
+                                                <X size={13} />
                                             </button>
-                                        )}
+                                        </div>
                                     </div>
                                 )
                             })
