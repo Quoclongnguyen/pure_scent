@@ -26,6 +26,14 @@ const userSchema = mongoose.Schema(
       enum: ['user', 'staff', 'superAdmin'],
       default: 'user',
     },
+    phone: {
+      type: String,
+      required: false,
+    },
+    address: {
+      type: String,
+      required: false,
+    },
   },
   {
     timestamps: true,
@@ -38,9 +46,9 @@ userSchema.methods.matchPassword = async function (enteredPassword) {
 };
 
 // Middleware để mã hóa mật khẩu trước khi lưu
-userSchema.pre("save", async function (next) {
+userSchema.pre("save", async function () {
   if (!this.isModified("password")) {
-    next();
+    return;
   }
 
   const salt = await bcrypt.genSalt(10);

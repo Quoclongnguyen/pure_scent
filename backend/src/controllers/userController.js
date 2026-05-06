@@ -83,9 +83,78 @@ const getUserProfile = async (req, res) => {
       email: user.email,
       isAdmin: user.isAdmin,
       role: user.role,
+      phone: user.phone || '',
+      address: user.address || '',
     });
   } else {
     res.status(404).json({ message: "User not found" });
+  }
+};
+
+// PUT /api/users/profile
+
+const updateUserProfile = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id);
+
+    if (user) {
+      if (req.body.email && req.body.email !== user.email) {
+        const emailExists = await User.findOne({ email: req.body.email });
+        if (emailExists) {
+          res.status(400).json({ message: "Email này đã được sử dụng bởi tài khoản khác" });
+          return;
+        }
+      }
+
+      user.name = req.body.name || user.name;
+      user.email = req.body.email || user.email;
+      user.phone = req.body.phone !== undefined ? req.body.phone : user.phone;
+      user.address = req.body.address !== undefined ? req.body.address : user.address;
+
+      const updatedUser = await user.save();
+
+      res.json({
+        _id: updatedUser._id,
+        name: updatedUser.name,
+        email: updatedUser.email,
+        isAdmin: updatedUser.isAdmin,
+        role: updatedUser.role,
+        phone: updatedUser.phone || '',
+        address: updatedUser.address || '',
+      });
+    } else {
+      res.status(404).json({ message: "Không tìm thấy người dùng" });
+    }
+  } catch (error) {
+    res.status(500).json({ message: error.message || "Lỗi server khi cập nhật hồ sơ" });
+  }
+};
+
+
+// PUT /api/users/profile/password
+const updateUserPassword = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id);
+
+    if (user) {
+      const { oldPassword, newPassword } = req.body;
+      if (!(await user.matchPassword(oldPassword))) {
+        res.status(400).json({ message: "Mật khẩu hiện tại không chính xác" });
+        return;
+      }
+
+      if (newPassword && newPassword.length >= 6) {
+        user.password = newPassword;
+        await user.save();
+        res.json({ message: "Đổi mật khẩu thành công" });
+      } else {
+        res.status(400).json({ message: "Mật khẩu mới phải có ít nhất 6 ký tự" });
+      }
+    } else {
+      res.status(404).json({ message: "Không tìm thấy người dùng" });
+    }
+  } catch (error) {
+    res.status(500).json({ message: error.message || "Lỗi server khi cập nhật mật khẩu" });
   }
 };
 
@@ -122,8 +191,8 @@ const updateUserRole = async (req, res) => {
 
   if (user) {
     if (user._id.toString() === req.user._id.toString()) {
-        res.status(400).json({ message: "Không thể tự đổi quyền của chính mình" });
-        return;
+      res.status(400).json({ message: "Không thể tự đổi quyền của chính mình" });
+      return;
     }
     user.role = req.body.role || user.role;
     user.isAdmin = (user.role === 'staff' || user.role === 'superAdmin');
@@ -147,6 +216,8 @@ export {
   registerUser,
   logoutUser,
   getUserProfile,
+  updateUserProfile,
+  updateUserPassword,
   getUsers,
   deleteUser,
   updateUserRole,
