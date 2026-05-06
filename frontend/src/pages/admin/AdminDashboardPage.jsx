@@ -36,7 +36,7 @@ const AdminDashboardPage = () => {
                 setStats({
                     revenue,
                     totalOrders: ordersData.length,
-                    totalProducts: productsData.length,
+                    totalProducts: productsRes.data.total || productsRes.data.products?.length || 0,
                     totalCustomers: usersData.length
                 })
 
