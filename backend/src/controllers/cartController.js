@@ -134,3 +134,12 @@ export const syncCart = async (req, res) => {
         res.status(500).json({ message: "Lỗi khi đồng bộ giỏ hàng", error: error.message });
     }
 };
+
+export const deleteCart = async (req, res) => {
+    try {
+        await Cart.findOneAndDelete({ user: req.user._id })
+        res.json({ message: 'Cart cleared' })
+    } catch (error) {
+        res.status(500).json({ message: error.message })
+    }
+}

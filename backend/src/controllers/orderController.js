@@ -97,6 +97,10 @@ export const updateOrderToPaid = async (req, res) => {
             // Nếu bạn muốn lưu thêm thông tin từ cổng thanh toán thì thêm vào đây
             // order.paymentResult = { id: req.body.id, status: req.body.status, ... }
             const updatedOrder = await order.save();
+
+            // Xóa giỏ hàng sau thanh toán
+            await Cart.findOneAndDelete({ user: order.user._id });
+
             await Notification.create({
                 message: `Đơn hàng #${order._id.toString().substring(0, 8)} - ${order.totalPrice.toLocaleString('vi-VN')}đ được thanh toán bởi  ${req.user.name}`,
                 type: 'payment_success',

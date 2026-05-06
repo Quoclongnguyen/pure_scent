@@ -1,5 +1,5 @@
 import express from 'express'
-import { addItemToCart, getCart, removeFromCart, syncCart, updateCartItem } from '../controllers/cartController.js'
+import { addItemToCart, deleteCart, getCart, removeFromCart, syncCart, updateCartItem } from '../controllers/cartController.js'
 import { protect } from '../middleware/authMiddleware.js'
 
 const router = express.Router()
@@ -7,7 +7,7 @@ const router = express.Router()
 
 router.use(protect)
 
-router.route('/').get(getCart)
+router.route('/').get(getCart).delete(deleteCart)
 router.post('/add', addItemToCart)
 router.put('/update', updateCartItem)
 router.post('/remove', removeFromCart)// Dùng POST để dễ dàng gửi body (product id, size)

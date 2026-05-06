@@ -161,6 +161,21 @@ export const CartProvider = ({ children }) => {
         }
     }
 
+    const clearCart = async () => {
+        setCartItems([])
+        localStorage.removeItem('pure_scent_cart')
+        localStorage.removeItem('pure_scent_cart_is_guest')
+
+        // Nếu đã login, xóa giỏ hàng trên server
+        if (userInfo) {
+            try {
+                await api.delete('/api/cart')
+            } catch (error) {
+                console.error('Lỗi xóa giỏ hàng trên server:', error)
+            }
+        }
+    }
+
     const cartCount = cartItems.reduce((acc, item) => acc + (Number(item.quantity) || 0), 0) // tính tổng sản phẩm
     const cartTotal = cartItems.reduce((acc, item) => acc + ((Number(item.price) || 0) * (Number(item.quantity) || 0)), 0)
 
@@ -174,6 +189,7 @@ export const CartProvider = ({ children }) => {
             addToCart,
             removeFromCart,
             updateQuantity,
+            clearCart,
             cartCount,
             cartTotal
         }}>

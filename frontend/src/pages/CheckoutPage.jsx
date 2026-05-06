@@ -10,7 +10,7 @@ import api from '../utils/Axios'
 
 const CheckoutPage = () => {
     const navigate = useNavigate()
-    const { cartItems, cartTotal, cartCount } = useContext(CartContext)
+    const { cartItems, cartTotal, cartCount, clearCart } = useContext(CartContext)
     const { userInfo } = useContext(AuthContext)
 
     useEffect(() => {
@@ -52,7 +52,12 @@ const CheckoutPage = () => {
                 shippingPrice,
                 totalPrice
             }
+
+
             const { data } = await api.post('/api/orders', orderData)
+            //  XÓA giỏ hàng sau khi đặt hàng thành công
+            clearCart()
+
             toast.success("Đặt hàng thành công!")
             // Chuyển đến trang chi tiết đơn hàng để hiện mã QR
             navigate(`/order/${data._id}`)
