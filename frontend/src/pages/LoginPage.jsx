@@ -1,5 +1,5 @@
 import React, { useContext, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { Eye, EyeOff, Mail, Lock, ArrowRight } from 'lucide-react'
 import AuthContext from '../context/AuthContext';
 import api from '../utils/Axios.js'
@@ -15,6 +15,15 @@ const LoginPage = () => {
 
     const { login } = useContext(AuthContext)
     const navigate = useNavigate()
+    const location = useLocation()
+
+    // Lấy query param 'redirect' từ URL (ví dụ: /login?redirect=/checkout)
+    const rawRedirect = new URLSearchParams(location.search).get('redirect') || '/';
+
+    // Bảo mật: Chỉ cho phép redirect tới các route an toàn trong hệ thống
+    const validRoutes = ['/checkout', '/cart', '/shop', '/profile', '/'];
+    const safeRedirect = validRoutes.includes(rawRedirect) ? rawRedirect : '/';
+
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
@@ -33,7 +42,7 @@ const LoginPage = () => {
 
             login(res.data);
             toast.success("Đăng nhập thành công!");
-            navigate('/');
+            navigate(safeRedirect);
 
         } catch (error) {
             console.log("lỗi khi đăng nhập".error)

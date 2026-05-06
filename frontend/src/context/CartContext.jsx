@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState } from 'react'
+import React, { createContext, useContext, useEffect, useState, useRef } from 'react'
 import AuthContext from './AuthContext'
 import api from '../utils/Axios'
 
@@ -19,6 +19,8 @@ export const CartProvider = ({ children }) => {
     }, [cartItems])
 
     // fetch giỏ hàng từ DB hoặc Sync khi đăng nhập
+    const prevUserInfo = useRef(userInfo)
+
     useEffect(() => {
         const fetchOrSyncCart = async () => {
             if (userInfo) {
@@ -52,11 +54,19 @@ export const CartProvider = ({ children }) => {
                     console.error('Lỗi khi đồng bộ giỏ hàng ', error)
                 }
             } else {
-                // Nếu chưa đăng nhập, đánh dấu giỏ hàng hiện tại là của khách
-                if (cartItems.length > 0) {
-                    localStorage.setItem('pure_scent_cart_is_guest', 'true')
+                // Nếu vừa đăng xuất (userInfo từ có thành null) -> Xóa giỏ hàng
+                if (prevUserInfo.current && !userInfo) {
+                    setCartItems([])
+                    localStorage.removeItem('pure_scent_cart')
+                    localStorage.removeItem('pure_scent_cart_is_guest')
+                } else {
+                    // Nếu chưa đăng nhập từ đầu, đánh dấu giỏ hàng hiện tại là của khách
+                    if (cartItems.length > 0) {
+                        localStorage.setItem('pure_scent_cart_is_guest', 'true')
+                    }
                 }
             }
+            prevUserInfo.current = userInfo
         }
         fetchOrSyncCart()
     }, [userInfo])  // Chạy lại mỗi khi trạng thái đăng nhập thay đổi

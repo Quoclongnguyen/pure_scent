@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react'
+import React, { useContext, useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { ChevronRight, CreditCard, Landmark, Truck, ShieldCheck, MapPin } from 'lucide-react'
 import CartContext from '../context/CartContext';
@@ -12,6 +12,13 @@ const CheckoutPage = () => {
     const navigate = useNavigate()
     const { cartItems, cartTotal, cartCount } = useContext(CartContext)
     const { userInfo } = useContext(AuthContext)
+
+    useEffect(() => {
+        if (!userInfo) {
+            toast.error("Vui lòng đăng nhập để tiếp tục thanh toán!")
+            navigate('/login?redirect=/checkout') // tọa độ sẽ tự động đưa user quay lại đúng trang thanh toán 
+        }
+    }, [userInfo, navigate])
     const [shippingAddress, setShippingAddress] = useState({
         fullname: userInfo?.name || '',
         phone: '',
@@ -52,6 +59,10 @@ const CheckoutPage = () => {
         } catch (error) {
             toast.error(error.response?.data?.message || "Có lỗi khi đặt hàng")
         }
+    }
+
+    if (!userInfo) {
+        return null // Chờ redirect
     }
 
     if (cartCount === 0) {
