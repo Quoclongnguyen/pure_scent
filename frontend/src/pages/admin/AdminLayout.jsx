@@ -1,6 +1,7 @@
 import React from 'react'
 import { Link, Outlet, useLocation } from 'react-router-dom'
-import { LayoutDashboard, Package, ShoppingCart, Layers, LogOut, Bell, User, Bandage, Award } from 'lucide-react'
+import { LayoutDashboard, Package, ShoppingCart, Layers, LogOut, User, Bandage, Award } from 'lucide-react'
+import NotificationBell from '../../components/admin/NotificationBell'
 
 import AuthContext from '../../context/AuthContext'
 import { useContext } from 'react'
@@ -96,10 +97,7 @@ const AdminLayout = () => {
                     </h2>
 
                     <div className="flex items-center gap-8">
-                        <button className="relative text-gray-400 hover:text-black transition-colors cursor-pointer">
-                            <Bell size={20} strokeWidth={1.5} />
-                            <span className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
-                        </button>
+                        <NotificationBell />
                         <div className="flex items-center gap-3 pl-8 border-l border-gray-100">
                             <div className="text-right">
                                 <p className="text-[10px] font-bold uppercase tracking-widest">{userInfo?.name || 'Admin'}</p>

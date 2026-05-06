@@ -1,5 +1,6 @@
 import Order from "../models/orderModel.js";
 import Cart from "../models/cartModel.js";
+import Notification from "../models/notificationModel.js";
 
 export const addOrderItems = async (req, res) => {
     const {
@@ -34,6 +35,13 @@ export const addOrderItems = async (req, res) => {
 
             // Sau khi đặt hàng thành công, xóa sạch giỏ hàng của User
             await Cart.findOneAndDelete({ user: req.user._id });
+
+            // Tạo thông báo cho Admin
+            await Notification.create({
+                message: `Đơn hàng mới từ ${req.user.name}`,
+                type: 'new_order',
+                link: '/admin/orderlist',
+            });
 
             res.status(201).json(createdOrder);
         } catch (error) {
