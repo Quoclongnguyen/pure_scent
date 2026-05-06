@@ -4,11 +4,15 @@ import Product from "../models/productModel.js";
 
 const getProducts = async (req, res) => {
     try {
-        const pageSize = 8; // Số sản phẩm mỗi trang
+        const limit = Number(req.query.limit) || 8; // Cho phép truyền limit từ client
         const page = Number(req.query.pageNumber) || 1;
-        const { category, brand, minPrice, maxPrice, sort } = req.query;
+        const { category, brand, minPrice, maxPrice, sort, keyword } = req.query;
 
         const query = {};
+
+        if (keyword) {
+            query.name = { $regex: keyword, $options: "i" }; // Tìm kiếm không phân biệt chữ hoa thường
+        }
 
         if (category) query.category = category;
         if (brand) query.brand = brand;
@@ -34,14 +38,14 @@ const getProducts = async (req, res) => {
             .find(query)
             .populate("category brand", "name")
             .sort(sortObj)
-            .limit(pageSize)
-            .skip(pageSize * (page - 1))
+            .limit(limit)
+            .skip(limit * (page - 1))
 
 
         res.json({
             products,
             page,
-            pages: Math.ceil(count / pageSize),
+            pages: Math.ceil(count / limit),
             total: count
         })
 

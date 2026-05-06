@@ -1,4 +1,4 @@
-import React, { useContext } from 'react'
+import React, { useContext, useState, useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom';
 import { ShoppingCart, User, Search } from 'lucide-react';
 import AuthContext from '../../context/AuthContext';
@@ -8,6 +8,45 @@ import { toast } from 'sonner';
 const Navbar = () => {
     const { userInfo, logout } = useContext(AuthContext)
     const { cartCount } = useContext(CartContext)
+
+    // States cho Search
+    const [isSearchOpen, setIsSearchOpen] = useState(false)
+    const [searchQuery, setSearchQuery] = useState('')
+    const [searchResults, setSearchResults] = useState([])
+    const [isSearching, setIsSearching] = useState(false)
+    const searchRef = useRef(null)
+
+    // Debounce Call API
+    useEffect(() => {
+        const delayDebounceFn = setTimeout(async () => {
+            if (searchQuery.trim()) {
+                setIsSearching(true)
+                try {
+                    const res = await api.get(`/api/products?keyword=${searchQuery}&limit=5`)
+                    setSearchResults(res.data.products)
+                } catch (error) {
+                    console.error("Lỗi khi tìm kiếm", error)
+                } finally {
+                    setIsSearching(false)
+                }
+            } else {
+                setSearchResults([])
+            }
+        }, 500) // Đợi 500ms sau khi user ngừng gõ mới gọi API (Debounce)
+
+        return () => clearTimeout(delayDebounceFn)
+    }, [searchQuery])
+
+    // Đóng popup khi click ra ngoài
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (searchRef.current && !searchRef.current.contains(event.target)) {
+                setIsSearchOpen(false)
+            }
+        }
+        document.addEventListener("mousedown", handleClickOutside)
+        return () => document.removeEventListener("mousedown", handleClickOutside)
+    }, [])
     const handleLogout = async () => {
         try {
             await api.post('api/users/logout')
@@ -34,7 +73,80 @@ const Navbar = () => {
                 </ul>
 
                 <div className="flex gap-5 items-center cursor-pointer">
-                    <Search size={20} strokeWidth={1.5} />
+
+                    {/* Thanh tìm kiếm */}
+                    <div className="relative flex items-center" ref={searchRef}>
+                        <div className={`flex items-center overflow-hidden transition-all duration-300 ease-in-out ${isSearchOpen ? 'w-48 md:w-64 border-b border-black' : 'w-5'}`}>
+                            <Search
+                                size={20}
+                                strokeWidth={1.5}
+                                onClick={() => {
+                                    setIsSearchOpen(!isSearchOpen)
+                                    if (isSearchOpen) setSearchQuery('')
+                                }}
+                                className="cursor-pointer flex-shrink-0"
+                            />
+                            <input
+                                type="text"
+                                placeholder="Tìm kiếm nước hoa..."
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                className={`bg-transparent outline-none text-[11px] px-2 w-full transition-opacity duration-300 ${isSearchOpen ? 'opacity-100' : 'opacity-0'}`}
+                            />
+                        </div>
+
+                        {/* Kết quả tìm kiếm Dropdown */}
+                        {isSearchOpen && searchQuery.trim() && (
+                            <div className="absolute top-full right-0 mt-4 w-72 md:w-80 bg-white border border-gray-100 shadow-[0_10px_40px_rgba(0,0,0,0.08)] z-[100] rounded-sm max-h-[400px] overflow-y-auto">
+                                {isSearching ? (
+                                    <div className="p-6 text-center text-[10px] uppercase tracking-widest text-gray-400 font-bold">
+                                        Đang tìm kiếm...
+                                    </div>
+                                ) : searchResults.length > 0 ? (
+                                    <div className="flex flex-col">
+                                        {searchResults.map(product => (
+                                            <Link
+                                                key={product._id}
+                                                to={`/product/${product._id}`}
+                                                onClick={() => {
+                                                    setIsSearchOpen(false)
+                                                    setSearchQuery('')
+                                                }}
+                                                className="flex items-center gap-4 p-4 hover:bg-gray-50 transition-colors border-b border-gray-50 last:border-0 group"
+                                            >
+                                                <div className="w-12 h-16 bg-[#fcfcfc] flex-shrink-0 overflow-hidden">
+                                                    <img
+                                                        src={product.images?.[0]?.startsWith('http') ? product.images[0] : `http://localhost:3001${product.images?.[0]}`}
+                                                        alt={product.name}
+                                                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                                                    />
+                                                </div>
+                                                <div className="flex flex-col gap-1">
+                                                    <span className="text-[10px] font-bold uppercase tracking-widest line-clamp-1 group-hover:text-gray-600 transition-colors">{product.name}</span>
+                                                    <span className="text-[10px] text-gray-400">
+                                                        {product.variants?.[0]?.discountPrice
+                                                            ? product.variants[0].discountPrice.toLocaleString('vi-VN')
+                                                            : product.variants?.[0]?.originalPrice?.toLocaleString('vi-VN')}đ
+                                                    </span>
+                                                </div>
+                                            </Link>
+                                        ))}
+                                        <Link
+                                            to={`/shop?keyword=${searchQuery}`}
+                                            onClick={() => { setIsSearchOpen(false); setSearchQuery(''); }}
+                                            className="block p-4 text-center text-[10px] uppercase font-bold tracking-widest text-gray-400 hover:text-black hover:bg-gray-50 transition-colors border-t border-gray-100"
+                                        >
+                                            Xem tất cả kết quả
+                                        </Link>
+                                    </div>
+                                ) : (
+                                    <div className="p-6 text-center text-[10px] uppercase tracking-widest text-gray-400 font-bold">
+                                        Không tìm thấy "{searchQuery}"
+                                    </div>
+                                )}
+                            </div>
+                        )}
+                    </div>
 
 
 
