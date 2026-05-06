@@ -6,11 +6,34 @@ const getProducts = async (req, res) => {
     try {
         const pageSize = 8; // Số sản phẩm mỗi trang
         const page = Number(req.query.pageNumber) || 1;
-        const count = await Product.countDocuments({});
+        const { category, brand, minPrice, maxPrice, sort } = req.query;
+
+        const query = {};
+
+        if (category) query.category = category;
+        if (brand) query.brand = brand;
+        
+        if (minPrice || maxPrice) {
+            query['variants.originalPrice'] = {};
+            if (minPrice) query['variants.originalPrice'].$gte = Number(minPrice);
+            if (maxPrice) query['variants.originalPrice'].$lte = Number(maxPrice);
+        }
+
+        let sortObj = {};
+        if (sort === 'price_asc') {
+            sortObj = { 'variants.0.originalPrice': 1 };
+        } else if (sort === 'price_desc') {
+            sortObj = { 'variants.0.originalPrice': -1 };
+        } else {
+            sortObj = { createdAt: -1 }; // Mới Nhất
+        }
+
+        const count = await Product.countDocuments(query);
 
         const products = await Product
-            .find({})
+            .find(query)
             .populate("category brand", "name")
+            .sort(sortObj)
             .limit(pageSize)
             .skip(pageSize * (page - 1))
 

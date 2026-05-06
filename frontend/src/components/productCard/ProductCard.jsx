@@ -38,11 +38,11 @@ const ProductCard = ({ product }) => {
                 <div className='absolute text-white top-4 right-4 opacity-0 group-hover:opacity-100 transition-all duration-500 transform translate-y-4 group-hover:translate-y-0 '>
                     <Eye size={20} strokeWidth={2.5} />
                 </div>
-                <div className='absolute top-4 left-4'>
+                {/* <div className='absolute top-4 left-4'>
                     <span className='bg-white/80 backdrop-blur-sm px-3 py-1 text-[10px] uppercase tracking-widest text-black font-bold rounded-full'>
                         {product.gender}
                     </span>
-                </div>
+                </div> */}
             </Link>
 
             {/* Thông tin sản phẩm */}
