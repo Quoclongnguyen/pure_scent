@@ -91,13 +91,13 @@ const ShopPage = () => {
                         <h4 className='text-xs font-bold uppercase tracking-[0.2em] border-b border-black pb-2'>Bộ Sưu Tập
                         </h4>
                         <div className='flex flex-col gap-4 text-xs uppercase tracking-widest text-gray-500'>
-                            <button 
-                                onClick={() => { setSelectedCategory(''); setPage(1); }} 
+                            <button
+                                onClick={() => { setSelectedCategory(''); setPage(1); }}
                                 className={`text-left hover:text-black transition-colors ${selectedCategory === '' ? 'text-black font-bold' : ''}`}>
                                 Tất cả sản phẩm
                             </button>
                             {categories.map(cat => (
-                                <button 
+                                <button
                                     key={cat._id}
                                     onClick={() => { setSelectedCategory(cat._id); setPage(1); }}
                                     className={`text-left hover:text-black transition-colors ${selectedCategory === cat._id ? 'text-black font-bold' : ''}`}>
@@ -112,13 +112,13 @@ const ShopPage = () => {
                     <div className='space-y-6'>
                         <h4 className='text-xs font-bold uppercase tracking-[0.2em] border-b border-black pb-2'>Thương Hiệu</h4>
                         <div className='flex flex-col gap-4 text-xs uppercase tracking-widest text-gray-500'>
-                            <button 
-                                onClick={() => { setSelectedBrand(''); setPage(1); }} 
+                            <button
+                                onClick={() => { setSelectedBrand(''); setPage(1); }}
                                 className={`text-left hover:text-black transition-colors ${selectedBrand === '' ? 'text-black font-bold' : ''}`}>
                                 Tất cả thương hiệu
                             </button>
                             {brands.map(b => (
-                                <button 
+                                <button
                                     key={b._id}
                                     onClick={() => { setSelectedBrand(b._id); setPage(1); }}
                                     className={`text-left hover:text-black transition-colors ${selectedBrand === b._id ? 'text-black font-bold' : ''}`}>
@@ -131,12 +131,37 @@ const ShopPage = () => {
                     <div className='space-y-6'>
                         <h4 className='text-xs font-bold uppercase tracking-[0.2em] border-b border-black pb-2'>Giá Sản Phẩm</h4>
                         <div className='flex flex-col gap-4 text-xs uppercase tracking-widest text-gray-500'>
-                            <button onClick={() => { setPriceRange({ min: '', max: '' }); setPage(1); }} className={`text-left hover:text-black transition-colors ${priceRange.min === '' && priceRange.max === '' ? 'text-black font-bold' : ''}`}>Tất cả mức giá</button >
-                            <button onClick={() => { setPriceRange({ min: 0, max: 100000 }); setPage(1); }} className={`text-left hover:text-black transition-colors ${priceRange.max === 100000 ? 'text-black font-bold' : ''}`}>Giá dưới 100.000đ</button >
-                            <button onClick={() => { setPriceRange({ min: 100000, max: 200000 }); setPage(1); }} className={`text-left hover:text-black transition-colors ${priceRange.min === 100000 && priceRange.max === 200000 ? 'text-black font-bold' : ''}`}>100.000đ - 200.000đ</button>
-                            <button onClick={() => { setPriceRange({ min: 200000, max: 300000 }); setPage(1); }} className={`text-left hover:text-black transition-colors ${priceRange.min === 200000 && priceRange.max === 300000 ? 'text-black font-bold' : ''}`}>200.000đ - 300.000đ</button>
-                            <button onClick={() => { setPriceRange({ min: 500000, max: 1000000 }); setPage(1); }} className={`text-left hover:text-black transition-colors ${priceRange.min === 500000 ? 'text-black font-bold' : ''}`}>500.000đ - 1.000.000đ</button>
-                            <button onClick={() => { setPriceRange({ min: 1000000, max: '' }); setPage(1); }} className={`text-left hover:text-black transition-colors ${priceRange.min === 1000000 ? 'text-black font-bold' : ''}`}>Giá trên 1.000.000đ</button>
+                            <button onClick={() => {
+                                setPriceRange({ min: '', max: '' });
+                                setPage(1);
+                            }}
+                                className={`text-left hover:text-black transition-colors 
+                             ${priceRange.min === '' && priceRange.max === '' ? 'text-black font-bold' : ''}`}>Tất cả mức giá</button >
+                            <button onClick={() => {
+                                setPriceRange({ min: 0, max: 100000 });
+                                setPage(1);
+                            }}
+                                className={`text-left hover:text-black transition-colors 
+                            ${priceRange.max === 100000 ? 'text-black font-bold' : ''}`}>Giá dưới 100.000đ</button >
+                            <button onClick={() => {
+                                setPriceRange({ min: 100000, max: 200000 });
+                                setPage(1);
+                            }} className={`text-left hover:text-black transition-colors ${priceRange.min === 100000 && priceRange.max === 200000 ? 'text-black font-bold' : ''}`}>100.000đ - 200.000đ</button>
+                            <button onClick={() => {
+                                setPriceRange({ min: 200000, max: 300000 });
+                                setPage(1);
+                            }}
+                                className={`text-left hover:text-black transition-colors ${priceRange.min === 200000 && priceRange.max === 300000 ? 'text-black font-bold' : ''}`}>200.000đ - 300.000đ</button>
+                            <button onClick={() => {
+                                setPriceRange({ min: 500000, max: 1000000 });
+                                setPage(1);
+                            }}
+                                className={`text-left hover:text-black transition-colors ${priceRange.min === 500000 ? 'text-black font-bold' : ''}`}>500.000đ - 1.000.000đ</button>
+                            <button onClick={() => {
+                                setPriceRange({ min: 1000000, max: '' });
+                                setPage(1);
+                            }}
+                                className={`text-left hover:text-black transition-colors ${priceRange.min === 1000000 ? 'text-black font-bold' : ''}`}>Giá trên 1.000.000đ</button>
                         </div>
                     </div>
 
@@ -146,7 +171,7 @@ const ShopPage = () => {
                 <div className='flex-1 space-y-8'>
                     <div className='flex justify-between items-center text-[15px] uppercase tracking-widest text-gray border-b border-gray-200 pb-2'>
                         <p>Hiển thị {products?.length} sản phẩm</p>
-                        <select 
+                        <select
                             value={sort}
                             onChange={(e) => { setSort(e.target.value); setPage(1); }}
                             className='bg-transparent focus:outline-none text-back font-medium cursor-pointer'>

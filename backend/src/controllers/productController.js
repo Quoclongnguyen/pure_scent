@@ -16,20 +16,30 @@ const getProducts = async (req, res) => {
 
         if (category) query.category = category;
         if (brand) query.brand = brand;
-        
+
         if (minPrice || maxPrice) {
-            query['variants.originalPrice'] = {};
-            if (minPrice) query['variants.originalPrice'].$gte = Number(minPrice);
-            if (maxPrice) query['variants.originalPrice'].$lte = Number(maxPrice);
+            const minPriceNum = minPrice ? Number(minPrice) : 0
+            const maxPriceNum = maxPrice ? Number(maxPrice) : Infinity
+
+            query.variants = {
+                $elemMatch: {
+                    $or: [
+                        {
+                            originalPrice: { $gte: minPriceNum, $lte: maxPriceNum }
+                        },
+                        {
+                            discountPrice: { $gte: minPriceNum, $lte: maxPriceNum }
+                        }
+                    ]
+                }
+            }
         }
 
-        let sortObj = {};
+        let sortObj = { createdAt: -1 };
         if (sort === 'price_asc') {
             sortObj = { 'variants.0.originalPrice': 1 };
         } else if (sort === 'price_desc') {
             sortObj = { 'variants.0.originalPrice': -1 };
-        } else {
-            sortObj = { createdAt: -1 }; // Mới Nhất
         }
 
         const count = await Product.countDocuments(query);

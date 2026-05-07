@@ -94,11 +94,11 @@ const ProductDetailPage = () => {
 
                 {/* 1. Image Gallery */}
                 <div className="space-y-4">
-                    <div className="relative aspect-[4/5]  w-full bg-[#fcfcfc] overflow-hidden rounded-sm group ">
+                    <div className="relative  w-full bg-[#fcfcfc] overflow-hidden rounded-sm group ">
                         <img
                             src={getImageUrl(product.images?.[activeIndex])}
                             alt={product.name}
-                            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                            className="w-full h-auto object-contain transition-transform duration-700 group-hover:scale-105"
                         />
                         <button className="absolute top-6 right-6 p-3 bg-white/80 backdrop-blur-md rounded-full hover:bg-white transition-all shadow-sm">
                             <Heart size={18} strokeWidth={1} />
@@ -110,7 +110,7 @@ const ProductDetailPage = () => {
                             <div
                                 key={index}
                                 onClick={() => setActiveIndex(index)}
-                                className={`flex-shrink-0 w-20 aspect-[4/5] bg-gray-50 border transition-all duration-300 cursor-pointer
+                                className={`flex-shrink-0 w-20  bg-gray-50 border transition-all duration-300 cursor-pointer
                             ${activeIndex === index ? 'border-black' : 'border-gray-100 opacity-60 hover:opacity-100'} `}
                             >
                                 <img src={getImageUrl(img)}
