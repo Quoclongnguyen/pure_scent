@@ -51,7 +51,7 @@ const ProductCard = ({ product }) => {
                     {product.brand?.name || product.brand}
                 </p>
                 <Link to={`/product/${product._id}`}>
-                    <h3 className='font-serif text-lg text-black hover:text-gray-600 transition-colors'>
+                    <h3 className='font-serif text-lg text-black hover:text-gray-600 transition-colors line-clamp-2 h-14'>
                         {product.name}
                     </h3>
                 </Link>
