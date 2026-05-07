@@ -28,6 +28,7 @@ import { useContext } from 'react'
 import AuthContext from './context/AuthContext'
 import AdminRoute from './components/auth/AdminRoute'
 import SuperAdminRoute from './components/auth/SuperAdminRoute'
+import ScrollToTop from './components/scrolltotop/ScrollToTop'
 
 const AdminIndexRedirect = () => {
   const { userInfo } = useContext(AuthContext);
@@ -41,6 +42,7 @@ function App() {
 
   return (
     <>
+      <ScrollToTop />
       <Toaster
 
         position="top-right"
