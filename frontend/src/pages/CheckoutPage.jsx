@@ -26,6 +26,8 @@ const CheckoutPage = () => {
         city: '',
         note: ''
     })
+
+
     const [paymentMethod, setPaymentMethod] = useState('Chuyển khoản')
 
     const subtotal = cartItems.reduce((acc, item) => acc + (item.price * item.quantity), 0);
@@ -37,8 +39,49 @@ const CheckoutPage = () => {
     const handleChange = (e) => {
         setShippingAddress({ ...shippingAddress, [e.target.name]: e.target.value })
     }
+
+    const [touched, setTouched] = useState({
+        fullname: false,
+        phone: false,
+        address: false,
+        city: false,
+    })
+
+    const requiredFields = {
+        fullname: 'Họ và tên',
+        phone: 'Số điện thoại',
+        address: 'Địa chỉ giao hàng',
+        city: 'Tỉnh / Thành phố',
+    }
+
+    const getError = (fieldName) => {
+        if (touched[fieldName] && !shippingAddress[fieldName]?.trim()) {
+            return `Vui lòng nhập ${requiredFields[fieldName].toLowerCase()}`
+        }
+        return null
+    }
+    const handleBlur = (e) => {
+        setTouched(prev => ({ ...prev, [e.target.name]: true }))
+    }
+
     const handleSubmit = async (e) => {
         e.preventDefault()
+
+        setTouched({
+            fullname: true,
+            phone: true,
+            address: true,
+            city: true
+        })
+
+        const hasErrors = Object.keys(requiredFields).some(
+            field => !shippingAddress[field]?.trim()
+        )
+        if (hasErrors) {
+            toast.error("Vui lòng điền đầy đủ thông tin giao hàng!")
+            return
+        }
+
         if (cartItems.length === 0) {
             toast.error("Giỏ hàng đang trống!")
             return
@@ -78,6 +121,12 @@ const CheckoutPage = () => {
             </div>
         )
     }
+    // Reusable input class helper
+    const inputClass = (fieldName) =>
+        `w-full border-b py-3 focus:outline-none transition-colors text-sm ${getError(fieldName)
+            ? 'border-red-400 focus:border-red-500'
+            : 'border-gray-200 focus:border-black'
+        }`
     return (
         <main className="min-h-screen bg-white pb-24">
 
@@ -108,41 +157,69 @@ const CheckoutPage = () => {
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div className="space-y-2">
                                     <label className="text-[10px] uppercase tracking-widest font-bold">
-                                        Họ và tên</label>
-                                    <input required name="fullname"
+                                        Họ và tên  <span className="text-red-400">*</span></label>
+                                    <input name="fullname"
                                         value={shippingAddress.fullname}
                                         onChange={handleChange}
-                                        className="w-full border-b border-gray-200 py-3 focus:outline-none focus:border-black transition-colors text-sm" />
+                                        onBlur={handleBlur}
+                                        className={inputClass('fullname')} />
+                                    {getError('fullname') && (
+                                        <p className="text-red-400 text-[10px] mt-1">{getError('fullname')}</p>
+                                    )}
                                 </div>
 
                                 <div className="space-y-2">
                                     <label className="text-[10px] uppercase tracking-widest font-bold">
-                                        Số điện thoại</label>
-                                    <input required name="phone"
+                                        Số điện thoại  <span className="text-red-400">*</span></label>
+                                    <input name="phone"
                                         value={shippingAddress.phone}
                                         onChange={handleChange}
+                                        onBlur={handleBlur}
                                         placeholder="0123 456 789"
+                                        className={inputClass('phone')}
+                                    />
+                                    {getError('phone') && (
+                                        <p className="text-red-400 text-[10px] mt-1">{getError('phone')}</p>
+                                    )}
+                                </div>
+
+                                <div className="md:col-span-2 space-y-2">
+                                    <label className="text-[10px] uppercase tracking-widest font-bold">
+                                        Email nhận hóa đơn  <span className="text-red-400">*</span></label>
+                                    <input type="email"
+                                        placeholder="example@gmail.com"
                                         className="w-full border-b border-gray-200 py-3 focus:outline-none focus:border-black transition-colors text-sm" />
                                 </div>
 
                                 <div className="md:col-span-2 space-y-2">
                                     <label className="text-[10px] uppercase tracking-widest font-bold">
-                                        Email nhận hóa đơn</label>
-                                    <input type="email" placeholder="example@gmail.com" className="w-full border-b border-gray-200 py-3 focus:outline-none focus:border-black transition-colors text-sm" />
-                                </div>
-                                <div className="md:col-span-2 space-y-2">
-                                    <label className="text-[10px] uppercase tracking-widest font-bold">
-                                        Địa chỉ giao hàng</label>
-                                    <input required name="address"
+                                        Địa chỉ giao hàng  <span className="text-red-400">*</span></label>
+                                    <input name="address"
                                         value={shippingAddress.address}
                                         onChange={handleChange}
+                                        onBlur={handleBlur}
                                         placeholder="Số nhà, tên đường, phường/xã..."
-                                        className="w-full border-b border-gray-200 py-3 focus:outline-none focus:border-black transition-colors text-sm" />
+                                        className={inputClass('address')}
+                                    />
+                                    {getError('address') && (
+                                        <p className="text-red-400 text-[10px] mt-1">{getError('address')}</p>
+                                    )}
                                 </div>
 
                                 <div className="space-y-2">
-                                    <label className="text-[10px] uppercase tracking-widest text-gray-400">Tỉnh / Thành phố</label>
-                                    <input required name="city" value={shippingAddress.city} onChange={handleChange} className="w-full border-b border-gray-200 py-2 outline-none focus:border-black transition-colors text-sm" placeholder="Ví dụ: Hà Nội" />
+                                    <label
+                                        className="text-[10px] uppercase tracking-widest text-gray-400">Tỉnh / Thành phố  <span className="text-red-400">*</span></label>
+                                    <input
+                                        name="city"
+                                        value={shippingAddress.city}
+                                        onChange={handleChange}
+                                        onBlur={handleBlur}
+                                        placeholder="Ví dụ: Hà Nội"
+                                        className={inputClass('city')}
+                                    />
+                                    {getError('city') && (
+                                        <p className="text-red-400 text-[10px] mt-1">{getError('city')}</p>
+                                    )}
                                 </div>
                             </div>
 
