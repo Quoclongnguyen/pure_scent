@@ -4,6 +4,7 @@ import { Eye, EyeOff, Mail, Lock, ArrowRight } from 'lucide-react'
 import AuthContext from '../context/AuthContext';
 import api from '../utils/Axios.js'
 import { toast } from 'sonner';
+import { GoogleLogin } from '@react-oauth/google';
 
 const LoginPage = () => {
     const [showPassword, setShowPassword] = useState(false);
@@ -51,6 +52,21 @@ const LoginPage = () => {
 
         }
     };
+
+    const handleGoogleSuccess = async (credentialResponse) => {
+        try {
+
+            console.log('Full response:', credentialResponse)
+            const res = await api.post('/api/users/google-login', {
+                token: credentialResponse.credential
+            })
+            login(res.data);
+            toast.success("Đăng nhập thành công!");
+            navigate(rawRedirect)
+        } catch (error) {
+            toast.error(error.response?.data?.message || "Lỗi đăng nhập Google")
+        }
+    }
 
     return (
         <main className="min-h-screen flex items-center justify-center bg-[#fcfcfc] px-6 py-20">
@@ -130,10 +146,12 @@ const LoginPage = () => {
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">
-                        <button className="flex items-center justify-center gap-3 border border-gray-100 py-3 hover:border-black transition-all text-[10px] font-bold uppercase tracking-widest cursor-pointer">
-                            <img src="https://www.svgrepo.com/show/475656/google-color.svg" className="w-4 h-4" alt="Google" />
-                            Google
-                        </button>
+
+                        <GoogleLogin
+                            onSuccess={handleGoogleSuccess}
+                            onError={() => toast.error("Lỗi khi đăng nhập bằng Google")}
+                        />
+
                         <button className="flex items-center justify-center gap-3 border border-gray-100 py-3 hover:border-black transition-all text-[10px] font-bold uppercase tracking-widest cursor-pointer">
                             <img src="https://www.svgrepo.com/show/475647/facebook-color.svg" className="w-4 h-4" alt="Facebook" />
                             Facebook
