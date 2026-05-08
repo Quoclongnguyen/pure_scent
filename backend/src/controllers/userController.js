@@ -1,6 +1,10 @@
 import User from "../models/userModel.js";
 import generateToken from "../utils/generateToken.js";
+import jwt from 'jsonwebtoken';
+import { OAuth2Client } from "google-auth-library"
 
+
+const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID)
 // @desc    Auth user & get token
 // @route   POST /api/users/login
 // @access  Public
@@ -211,6 +215,51 @@ const updateUserRole = async (req, res) => {
   }
 };
 
+const googleLogin = async (req, res) => {
+  try {
+    const { token } = req.body
+
+    if (!token) {
+      return res.status(400).json({ message: 'Token không được gửi' })
+    }
+    // Verify Google token
+    const ticket = await googleClient.verifyIdToken({
+      idToken: token,
+      audience: process.env.GOOGLE_CLIENT_ID
+    })
+
+    const payload = ticket.getPayload()
+    const { email, name } = payload
+
+    // Tìm hoặc tạo user
+    let user = await User.findOne({ email })
+
+    if (!user) {
+      user = await User.create({
+        name: name || email.split('@')[0],
+        email,
+        password: 'google-' + Math.random().toString(36),
+        role: 'user'
+      })
+    }
+
+    // Tạo JWT token
+    generateToken(res, user._id)
+
+    res.json({
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      token: jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '7d' })
+    })
+  } catch (error) {
+    console.error('Google login error:', error)
+    res.status(400).json({ message: 'Google login failed' })
+  }
+}
+
+
 export {
   authUser,
   registerUser,
@@ -221,4 +270,5 @@ export {
   getUsers,
   deleteUser,
   updateUserRole,
+  googleLogin
 };
