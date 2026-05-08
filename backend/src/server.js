@@ -1,7 +1,6 @@
 import express from "express";
 import dotenv from "dotenv";
 dotenv.config();
-
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import connectDB from "./config/db.js";
@@ -17,30 +16,19 @@ import notificationRoutes from "./routes/notificationRoutes.js"
 
 const app = express();
 const PORT = process.env.PORT || 3001;
-// Connect to MongoDB
-connectDB().then(() => {
-  app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
-  });
-}).catch((error) => {
-  console.log(`Error: ${error.message}`);
-  process.exit(1);
-});
-
-
-
-//uploadImg
-const __dirname = path.resolve()
-app.use('/uploads', express.static(path.join(__dirname, '/uploads')))
 
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(cors({
-  origin: "http://localhost:5173", // default vite port
+  origin: [process.env.FRONTEND_URL, "https://purescent.vercel.app"], // default vite port
   credentials: true
 }));
+
+//uploadImg
+const __dirname = path.resolve()
+app.use('/uploads', express.static(path.join(__dirname, '/uploads')))
 
 app.use("/api/users", userRoutes);
 app.use("/api/products", productRouters)
@@ -57,3 +45,12 @@ app.get("/", (req, res) => {
 
 
 
+// Connect to MongoDB
+connectDB().then(() => {
+  app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+  });
+}).catch((error) => {
+  console.log(`Error: ${error.message}`);
+  process.exit(1);
+});
