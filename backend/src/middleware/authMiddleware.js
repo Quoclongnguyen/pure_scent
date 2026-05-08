@@ -5,20 +5,26 @@ import User from "../models/userModel.js";
 const protect = async (req, res, next) => {
   let token;
 
-  // Đọc JWT từ cookie
-  token = req.cookies.jwt;
+  if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
+    token = req.headers.authorization.split(' ')[1]  // "Bearer TOKEN" → TOKEN
+  } else if (req.cookies.jwt) {
+    token = req.cookies.jwt
+  }
 
-  if (token) {
-    try {
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      req.user = await User.findById(decoded.userId).select("-password");
-      next();
-    } catch (error) {
-      console.error(error);
-      res.status(401).json({ message: "Không được xác thực, token thất bại" });
+  if (!token) {
+    return res.status(401).json({ message: 'Không có token, vui lòng đăng nhập' })
+  }
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET)
+    req.user = await User.findById(decoded.userId || decoded.id)  // ← Thử cả userId và id
+
+    if (!req.user) {
+      return res.status(401).json({ message: 'User không tồn tại' })
     }
-  } else {
-    res.status(401).json({ message: "Không được xác thực, không có token" });
+
+    next()
+  } catch (error) {
+    res.status(401).json({ message: 'Token không hợp lệ' })
   }
 };
 
