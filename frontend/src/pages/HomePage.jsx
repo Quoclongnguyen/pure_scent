@@ -100,7 +100,7 @@ const HomePage = () => {
                     <div className='max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-16 items-center'>
                         <div className='relative h-[450px] overflow-hidden rounded-[8px] shadow-2xl'>
                             <img
-                                src="/src/assets/img1.png"
+                                src="/background.png"
                                 alt="Nước Hoa"
                                 className='w-full h-full object-cover'
                             />
