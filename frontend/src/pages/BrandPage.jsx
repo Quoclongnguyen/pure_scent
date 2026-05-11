@@ -22,7 +22,7 @@ const BrandPage = () => {
                 <div className='relative group'>
                     <div className='aspect-[4/5] overflow-hidden rounded-[8px]'>
                         <img
-                            src="/src/assets/img1.png"
+                            src="/pure.png"
                             alt="Brand Story"
                             className='w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000'
                         />

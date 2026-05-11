@@ -49,7 +49,7 @@ const HomePage = () => {
 
                         <div className='relative h-[450px] overflow-hidden rounded-[8px] shadow-2xl'>
                             <img
-                                src="/src/assets/img1.png"
+                                src="/img1.png"
                                 alt="Nước Hoa"
                                 className='w-full h-full object-cover'
                             />
