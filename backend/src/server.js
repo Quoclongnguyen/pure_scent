@@ -21,10 +21,19 @@ const PORT = process.env.PORT || 3001;
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+
 app.use(cors({
-  origin: [process.env.FRONTEND_URL, "https://purescent.vercel.app"], // default vite port
+  origin: (origin, callback) => {
+    if (!origin ||
+      origin.includes('vercel.app') || // bất kỳ URL nào chứa vercel.app đều được cho phép 
+      origin === 'http://localhost:5173') {
+      callback(null, true)
+    } else {
+      callback(new Error('Not allowed by CORS'))
+    }
+  },
   credentials: true
-}));
+}))
 
 //uploadImg
 const __dirname = path.resolve()
