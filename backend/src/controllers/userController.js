@@ -49,7 +49,7 @@ const registerUser = async (req, res) => {
   });
 
   if (user) {
-    generateToken(res, user._id);
+    const token = generateToken(res, user._id);
 
     res.status(201).json({
       _id: user._id,
@@ -57,6 +57,7 @@ const registerUser = async (req, res) => {
       email: user.email,
       isAdmin: user.isAdmin,
       role: user.role,
+      token,
     });
   } else {
     res.status(400).json({ message: "Invalid user data" });
