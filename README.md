@@ -88,6 +88,17 @@ PureScent provides a modern shopping experience with authentication, online orde
 | ![Admin](screenshots/admin.png) | ![Checkout](screenshots/checkout.png) |
 ---
 
+
+## 🔑 Demo Accounts
+
+| Role | Email | Password |
+|------|-------|----------|
+| Admin | admin@purescent.com | 123456 |
+| Staff | user1@gmail.com | 123456 |
+| User | test@gmail.com | 123456 |
+
+
+
 ## 🏗️ Project Architecture
 
 ```bash
